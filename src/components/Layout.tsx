@@ -20,10 +20,10 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Kit Jurídico', href: '/juridico', icon: ClipboardList },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Kit Jurídico', href: '/kit-juridico', icon: ClipboardList },
   { name: 'Calculadora de Lucro', href: '/calculadora', icon: BarChart },
-  { name: 'Recepção que Vende', href: '/recepcao-que-vende', icon: Clapperboard },
+  { name: 'Recepção que Vende', href: '/recepcao-vende', icon: Clapperboard },
 ]
 
 export default function Layout() {
@@ -99,7 +99,7 @@ export default function Layout() {
             <div className="flex items-center gap-2">
               <Crown className="size-5 text-primary hidden sm:block" />
               <h1 className="font-heading text-lg text-foreground/90 font-semibold truncate max-w-[150px] sm:max-w-none">
-                Mentoria High-Ticket
+                Mentoria Beleza High-Ticket
               </h1>
             </div>
           </div>
@@ -114,10 +114,10 @@ export default function Layout() {
             </Avatar>
             <Button
               variant="ghost"
-              size="icon"
               onClick={signOut}
-              className="text-muted-foreground hover:text-foreground hover:bg-secondary"
+              className="text-muted-foreground hover:text-foreground hover:bg-secondary flex items-center gap-2"
             >
+              <span className="hidden sm:inline-block">Sair</span>
               <LogOut className="size-4" />
             </Button>
           </div>

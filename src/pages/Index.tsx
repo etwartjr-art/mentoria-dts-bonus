@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import {
-  ClipboardList,
-  BarChart,
-  Clapperboard,
+  Scale,
+  Calculator as CalculatorIcon,
+  MessageCircle,
   ArrowRight,
   Sparkles,
   CheckCircle2,
@@ -49,10 +49,10 @@ export default function Index() {
         const data = [
           {
             title: 'Kit de Sobrevivência Jurídica',
-            description: 'Checklist da Lei do Salão Parceiro, modelos de NDA e alertas vitais.',
-            icon: ClipboardList,
-            href: '/juridico',
-            color: 'text-blue-500',
+            description: 'Checklist e contratos vitais.',
+            icon: Scale,
+            href: '/kit-juridico',
+            color: 'text-blue-600',
             acessado: checkAcessado('juridico'),
             progressoText: progresso
               ? `${[progresso.checklist_completo, progresso.nda_baixado].filter(Boolean).length}/2 Concluído`
@@ -60,19 +60,19 @@ export default function Index() {
           },
           {
             title: 'Calculadora de Lucro Real',
-            description: 'Estrutura exata para calcular seu custo por minuto e lucro líquido.',
-            icon: BarChart,
+            description: 'Calcule seu custo por minuto e lucro.',
+            icon: CalculatorIcon,
             href: '/calculadora',
-            color: 'text-emerald-500',
+            color: 'text-emerald-600',
             acessado: checkAcessado('calculadora'),
             progressoText: checkAcessado('calculadora') ? 'Acessado' : 'Novo',
           },
           {
             title: 'Recepção que Vende',
-            description: 'Scripts de vendas, mentalidade e mensagens de reativação.',
-            icon: Clapperboard,
-            href: '/recepcao',
-            color: 'text-purple-500',
+            description: 'Scripts de vendas e reativação.',
+            icon: MessageCircle,
+            href: '/recepcao-vende',
+            color: 'text-purple-600',
             acessado: checkAcessado('recepcao'),
             progressoText: checkAcessado('recepcao') ? 'Acessado' : 'Novo',
           },
@@ -108,9 +108,9 @@ export default function Index() {
   if (status === 'error') {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4 max-w-5xl mx-auto">
-        <p className="text-destructive font-medium text-lg">Erro ao carregar. Tente novamente</p>
+        <p className="text-destructive font-medium text-lg">Erro ao carregar. Tente novamente.</p>
         <Button onClick={() => window.location.reload()} variant="outline">
-          Tentar Novamente
+          Retry
         </Button>
       </div>
     )
@@ -125,10 +125,7 @@ export default function Index() {
   }
 
   return (
-    <div
-      className="max-w-5xl mx-auto space-y-8 animate-slide-up opacity-0"
-      style={{ animationFillMode: 'forwards' }}
-    >
+    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 slide-in-from-bottom-4">
       {/* Hero Section */}
       <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-card p-8 md:p-12 shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -150,13 +147,12 @@ export default function Index() {
       </section>
 
       {/* Modules Grid */}
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {modules.map((mod) => (
           <Card
             key={mod.href}
-            className="group relative overflow-hidden border-border/50 bg-card/50 transition-all hover:border-primary/50 hover:bg-card flex flex-col"
+            className="group relative overflow-hidden border-border/50 bg-slate-50 transition-all duration-300 hover:scale-105 hover:shadow-lg flex flex-col"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <CardHeader className="flex-1">
               <div className="flex justify-between items-start mb-4">
                 <mod.icon className={`size-10 ${mod.color}`} />
@@ -174,15 +170,15 @@ export default function Index() {
                   </Badge>
                 )}
               </div>
-              <CardTitle className="font-heading text-xl">{mod.title}</CardTitle>
-              <CardDescription className="text-sm leading-relaxed mt-2">
+              <CardTitle className="font-heading text-xl text-slate-900">{mod.title}</CardTitle>
+              <CardDescription className="text-sm leading-relaxed mt-2 text-slate-700 font-medium">
                 {mod.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0 mt-auto">
-              <Button asChild className="w-full group/btn" variant="outline">
+              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white group/btn">
                 <Link to={mod.href}>
-                  Acessar Conteúdo
+                  Acessar
                   <ArrowRight className="ml-2 size-4 transition-transform group-hover/btn:translate-x-1" />
                 </Link>
               </Button>

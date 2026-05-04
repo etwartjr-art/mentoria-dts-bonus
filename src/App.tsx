@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -22,11 +22,11 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route element={<Layout />}>
-            {' '}
-            <Route path="/" element={<Index />} />
-            <Route path="/juridico" element={<LegalKit />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Index />} />
+            <Route path="/kit-juridico" element={<LegalKit />} />
             <Route path="/calculadora" element={<Calculator />} />
-            <Route path="/recepcao-que-vende" element={<Reception />} />
+            <Route path="/recepcao-vende" element={<Reception />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
