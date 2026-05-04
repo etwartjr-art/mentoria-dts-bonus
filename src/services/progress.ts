@@ -33,7 +33,11 @@ export const getProgress = async () => {
 }
 
 export const updateProgress = async (
-  data: Partial<{ checklist_completo: boolean; nda_baixado: boolean }>,
+  data: Partial<{
+    checklist_completo: boolean
+    nda_baixado: boolean
+    checklist_state: Record<number, boolean>
+  }>,
 ) => {
   if (!pb.authStore.record) return null
   let record

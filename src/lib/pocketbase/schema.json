@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T01:11:48.150Z",
+  "generatedAt": "2026-05-04T01:18:09.596Z",
   "collections": [
     {
       "name": "users",
@@ -129,6 +129,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "checklist_state",
+          "type": "json",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_progresso_user ON progresso_juridico (user)"]
