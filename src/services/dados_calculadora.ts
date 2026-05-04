@@ -10,7 +10,11 @@ export interface DadosCalculadora {
   tempo: number
   custo_operacional_minuto: number
   lucro_liquido: number
+  custo_fixo_mensal?: number
+  minutos_disponiveis?: number
+  margem_lucro?: number
   user: string
+  created?: string
 }
 
 export const getDadosCalculadora = async (userId: string) => {
@@ -18,6 +22,16 @@ export const getDadosCalculadora = async (userId: string) => {
     filter: `user="${userId}"`,
     sort: 'created',
   })
+}
+
+export const getHistoryCalculadora = async (userId: string) => {
+  return pb
+    .collection('dados_calculadora')
+    .getList<DadosCalculadora>(1, 5, {
+      filter: `user="${userId}"`,
+      sort: '-created',
+    })
+    .then((res) => res.items)
 }
 
 export const createDadosCalculadora = async (data: Omit<DadosCalculadora, 'id'>) => {

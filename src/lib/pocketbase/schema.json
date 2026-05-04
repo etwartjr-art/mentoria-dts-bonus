@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T02:04:04.208Z",
+  "generatedAt": "2026-05-04T02:09:23.636Z",
   "collections": [
     {
       "name": "users",
@@ -218,6 +218,24 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "custo_fixo_mensal",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "minutos_disponiveis",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "margem_lucro",
+          "type": "number",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": []
