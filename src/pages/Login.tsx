@@ -13,40 +13,38 @@ import {
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
 
 export default function Login() {
   const { signIn, user } = useAuth()
   const navigate = useNavigate()
-  const { toast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    if (user) navigate('/', { replace: true })
+    if (user) {
+      navigate('/', { replace: true })
+    }
   }, [user, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await signIn({ email, password })
-    setLoading(false)
+    setErrorMsg('')
+
+    const { error } = await signIn({ email: email.trim(), password })
+
     if (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro de autenticação',
-        description: 'Email ou senha incorretos',
-      })
-    } else {
-      navigate('/')
+      setLoading(false)
+      setErrorMsg('Email ou senha incorretos')
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-sm shadow-xl animate-fade-in">
+      <Card className="w-full max-w-sm shadow-xl animate-fade-in-up">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold font-heading">Login</CardTitle>
           <CardDescription>Entre na sua conta para acessar os bônus.</CardDescription>
@@ -85,6 +83,13 @@ export default function Login() {
                 </button>
               </div>
             </div>
+
+            {errorMsg && (
+              <p className="text-sm font-medium text-destructive text-center animate-fade-in">
+                {errorMsg}
+              </p>
+            )}
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Entrar

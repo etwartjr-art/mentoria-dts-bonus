@@ -18,14 +18,18 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>(pb.authStore.record)
+  const [user, setUser] = useState<any>(pb.authStore.isValid ? pb.authStore.record : null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    setUser(pb.authStore.isValid ? pb.authStore.record : null)
+
     const unsubscribe = pb.authStore.onChange((_token, record) => {
-      setUser(record)
+      setUser(pb.authStore.isValid ? record : null)
     })
+
     setLoading(false)
+
     return () => {
       unsubscribe()
     }
@@ -52,6 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = () => {
     pb.authStore.clear()
+    setUser(null)
   }
 
   return (
