@@ -23,7 +23,7 @@ const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Kit Jurídico', href: '/juridico', icon: ClipboardList },
   { name: 'Calculadora de Lucro', href: '/calculadora', icon: BarChart },
-  { name: 'Recepção que Vende', href: '/recepcao', icon: Clapperboard },
+  { name: 'Recepção que Vende', href: '/recepcao-que-vende', icon: Clapperboard },
 ]
 
 export default function Layout() {
