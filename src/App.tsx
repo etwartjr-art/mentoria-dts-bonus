@@ -4,6 +4,7 @@ import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/hooks/use-auth'
 import Layout from './components/Layout'
+import { PwaManager } from './components/PwaManager'
 import Index from './pages/Index'
 import LegalKit from './pages/LegalKit'
 import Calculator from './pages/Calculator'
@@ -18,6 +19,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PwaManager />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
