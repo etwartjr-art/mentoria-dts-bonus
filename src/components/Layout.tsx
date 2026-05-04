@@ -82,7 +82,7 @@ export default function Layout() {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-3 text-[16px] font-medium transition-colors ${
+                    className={`flex items-center gap-3 rounded-lg px-3 py-3 text-[16px] font-medium transition-all duration-200 hover:scale-105 ${
                       location.pathname === item.href
                         ? 'bg-primary/20 text-primary font-semibold'
                         : 'text-foreground hover:bg-primary/10 hover:text-primary active:bg-primary/20'
@@ -109,7 +109,7 @@ export default function Layout() {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`flex items-center gap-2 rounded-md px-4 py-2 text-[16px] font-medium transition-colors ${
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-[16px] font-medium transition-all duration-200 hover:scale-105 ${
                   location.pathname === item.href
                     ? 'bg-primary/10 text-primary font-semibold'
                     : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
@@ -129,7 +129,7 @@ export default function Layout() {
           <Button
             variant="outline"
             onClick={signOut}
-            className="text-foreground hover:text-primary active:scale-95 transition-all duration-200"
+            className="text-foreground hover:text-primary hover:scale-105 active:scale-95 transition-all duration-200"
             aria-label="Sair"
           >
             <LogOut className="size-5 sm:mr-2" />

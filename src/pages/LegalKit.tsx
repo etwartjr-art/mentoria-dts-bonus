@@ -194,7 +194,9 @@ export default function LegalKit() {
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <AlertTriangle className="size-12 text-destructive" />
         <h2 className="text-xl font-semibold">Erro ao carregar. Tente novamente</h2>
-        <Button onClick={loadData}>Tentar Novamente</Button>
+        <Button onClick={loadData} className="transition-all duration-200 hover:scale-105">
+          Tentar Novamente
+        </Button>
       </div>
     )
   }
@@ -206,10 +208,10 @@ export default function LegalKit() {
       </div>
       <div className="max-w-6xl mx-auto space-y-8 animate-fade-in print:hidden">
         <div className="space-y-2">
-          <h1 className="text-[20px] lg:text-[24px] font-bold text-primary tracking-tight leading-tight">
+          <h1 className="text-[24px] font-bold text-primary tracking-tight leading-tight">
             Kit de Sobrevivência Jurídica
           </h1>
-          <p className="text-base font-normal text-foreground">
+          <p className="text-[16px] font-normal text-foreground">
             Proteja seu negócio de passivos trabalhistas com os fundamentos corretos.
           </p>
         </div>
@@ -222,11 +224,11 @@ export default function LegalKit() {
               <CardHeader className="pb-6">
                 <div className="flex items-center gap-2 text-primary">
                   <CheckCircle2 className="size-6" />
-                  <CardTitle className="text-lg font-semibold text-foreground">
+                  <CardTitle className="text-[18px] font-semibold text-foreground">
                     Checklist: Cláusulas Obrigatórias no Contrato de Salão Parceiro
                   </CardTitle>
                 </div>
-                <CardDescription className="text-base font-normal text-foreground mt-2">
+                <CardDescription className="text-[16px] font-normal text-foreground mt-2">
                   Verifique se o seu contrato contempla todos os itens exigidos pela Lei
                   13.352/2016.
                 </CardDescription>
@@ -249,7 +251,7 @@ export default function LegalKit() {
                     />
                     <label
                       htmlFor={`check-${index}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none flex-1"
+                      className="text-[14px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer select-none flex-1"
                     >
                       {item}
                     </label>
@@ -259,7 +261,7 @@ export default function LegalKit() {
               <CardFooter>
                 <Button
                   variant={checklistCompleto ? 'secondary' : 'default'}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
                   onClick={toggleCompleteAll}
                 >
                   {checklistCompleto ? 'Desmarcar Todos' : 'Marcar como completo'}
@@ -269,7 +271,7 @@ export default function LegalKit() {
 
             {/* Common Errors */}
             <div className="space-y-4">
-              <h3 className="text-[20px] lg:text-[24px] font-bold flex items-center gap-2 text-destructive leading-tight">
+              <h3 className="text-[24px] font-bold flex items-center gap-2 text-destructive leading-tight">
                 <AlertTriangle className="size-6 shrink-0" />
                 <span>3 Erros Jurídicos que Levam a Processos Trabalhistas</span>
               </h3>
@@ -280,21 +282,21 @@ export default function LegalKit() {
                       <AccordionItem value={`error-${idx}`} className="border-b-0">
                         <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-destructive/10 rounded-t-xl transition-colors">
                           <div className="flex flex-col items-start text-left gap-1">
-                            <span className="text-lg font-semibold text-destructive">
+                            <span className="text-[18px] font-semibold text-destructive">
                               {error.title}
                             </span>
-                            <span className="text-base font-normal text-foreground">
+                            <span className="text-[16px] font-normal text-foreground">
                               {error.summary}
                             </span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent className="px-6 pb-6 pt-2">
-                          <p className="text-base font-normal leading-relaxed mb-4">
+                          <p className="text-[16px] font-normal leading-relaxed mb-4">
                             {error.description}
                           </p>
                           <Button
                             variant="outline"
-                            className="text-destructive border-destructive/20 hover:bg-destructive/10 h-9 px-3"
+                            className="text-destructive border-destructive/20 hover:bg-destructive/10 h-9 px-3 transition-all duration-200 hover:scale-105"
                             onClick={() => handleShare(error.title, error.description)}
                           >
                             <Share2 className="size-5 mr-2" />
@@ -315,18 +317,18 @@ export default function LegalKit() {
               <CardHeader className="pb-6">
                 <div className="flex items-center gap-2 text-success">
                   <Scale className="size-6" />
-                  <CardTitle className="text-lg font-semibold text-success">
+                  <CardTitle className="text-[18px] font-semibold text-success">
                     Modelo de NDA
                   </CardTitle>
                 </div>
-                <CardDescription className="text-base font-normal text-foreground mt-2">
+                <CardDescription className="text-[16px] font-normal text-foreground mt-2">
                   Acordo de Confidencialidade para proteger sua base de clientes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="nda" className="border-border">
-                    <AccordionTrigger className="text-base font-semibold hover:no-underline">
+                    <AccordionTrigger className="text-[16px] font-semibold hover:no-underline">
                       Ver texto do contrato
                     </AccordionTrigger>
                     <AccordionContent>
@@ -340,7 +342,7 @@ export default function LegalKit() {
               <CardFooter className="flex flex-col gap-3">
                 <Button
                   onClick={handleDownloadNda}
-                  className="w-full bg-success text-success-foreground hover:bg-success/90 min-h-[44px]"
+                  className="w-full bg-success text-success-foreground hover:bg-success/90 min-h-[44px] transition-all duration-200 hover:scale-105"
                 >
                   <FileDown className="size-5 mr-2" />
                   Baixar PDF / Imprimir

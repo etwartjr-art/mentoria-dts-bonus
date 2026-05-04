@@ -109,7 +109,11 @@ export default function Index() {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-4 max-w-5xl mx-auto">
         <p className="text-destructive font-medium text-lg">Erro ao carregar. Tente novamente.</p>
-        <Button onClick={() => window.location.reload()} variant="outline">
+        <Button
+          onClick={() => window.location.reload()}
+          variant="outline"
+          className="transition-all duration-200 hover:scale-105"
+        >
           Retry
         </Button>
       </div>
@@ -134,11 +138,11 @@ export default function Index() {
             <Sparkles className="size-5" />
             <span>Conteúdo Exclusivo</span>
           </div>
-          <h1 className="text-[24px] lg:text-[32px] font-bold tracking-tight text-primary leading-tight">
+          <h1 className="text-[24px] font-bold tracking-tight text-primary leading-tight">
             Bem-vindo ao seu <br className="hidden sm:block" />
             <span className="text-foreground">Dashboard de Elite</span>
           </h1>
-          <p className="text-base text-foreground font-normal">
+          <p className="text-[16px] text-foreground font-normal">
             Acesse as ferramentas práticas e materiais complementares da mentoria. Estes 3 bônus
             foram desenhados para proteger seu negócio, garantir sua margem de lucro e aumentar seu
             faturamento imediato.
@@ -170,15 +174,15 @@ export default function Index() {
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-[20px] lg:text-[24px] font-bold text-primary leading-tight">
+              <CardTitle className="text-[18px] font-semibold text-primary leading-tight">
                 {mod.title}
               </CardTitle>
-              <CardDescription className="text-base font-normal text-foreground mt-2">
+              <CardDescription className="text-[16px] font-normal text-foreground mt-2">
                 {mod.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0 mt-auto">
-              <Button asChild className="w-full">
+              <Button asChild className="w-full transition-all duration-200 hover:scale-105">
                 <Link to={mod.href}>
                   Acessar
                   <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
@@ -191,10 +195,10 @@ export default function Index() {
 
       {/* Quick Tips */}
       <section className="rounded-xl border border-border bg-muted p-6 mt-6">
-        <h3 className="text-[20px] lg:text-[24px] font-bold mb-4 text-primary">
+        <h3 className="text-[18px] font-semibold mb-4 text-primary">
           Dicas de Ouro para o Sucesso
         </h3>
-        <ul className="space-y-2 text-base text-foreground font-normal list-disc list-inside">
+        <ul className="space-y-2 text-[16px] text-foreground font-normal list-disc list-inside">
           <li>Sempre adapte os scripts de vendas para o seu tom de voz e da sua marca.</li>
           <li>Revise seu custo por minuto a cada 3 meses para não perder margem de lucro.</li>
           <li>Contratos verbais não têm validade jurídica no regime de salão parceiro.</li>

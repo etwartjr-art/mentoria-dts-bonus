@@ -200,12 +200,12 @@ export default function Reception() {
           <Button
             variant="ghost"
             onClick={() => window.history.back()}
-            className="w-fit -ml-4"
+            className="w-fit -ml-4 transition-all duration-200 hover:scale-105"
             aria-label="Voltar"
           >
             <ArrowLeft className="size-5 mr-2" /> Voltar
           </Button>
-          <h1 className="text-2xl font-bold text-primary">Recepção que Vende</h1>
+          <h1 className="text-[24px] font-bold text-primary">Recepção que Vende</h1>
         </div>
 
         <Tabs defaultValue={TABS[0].id} className="w-full">
@@ -221,14 +221,14 @@ export default function Reception() {
             <TabsContent key={tab.id} value={tab.id} className="mt-0 outline-none">
               <Card>
                 <CardHeader className="pb-6">
-                  <CardTitle className="text-xl font-bold text-primary">{tab.title}</CardTitle>
-                  <CardDescription className="text-base font-normal text-foreground mt-2">
+                  <CardTitle className="text-[24px] font-bold text-primary">{tab.title}</CardTitle>
+                  <CardDescription className="text-[16px] font-normal text-foreground mt-2">
                     {tab.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="bg-muted rounded-xl p-6 mb-6 border border-border">
-                    <pre className="whitespace-pre-wrap font-sans text-base font-normal leading-relaxed text-foreground">
+                    <pre className="whitespace-pre-wrap font-sans text-[16px] font-normal leading-relaxed text-foreground">
                       {tab.content}
                     </pre>
                   </div>
@@ -236,7 +236,7 @@ export default function Reception() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button
                       onClick={() => handleCopy(tab.content)}
-                      className="flex-1 gap-2"
+                      className="flex-1 gap-2 transition-all duration-200 hover:scale-105"
                       aria-label="Copiar Script"
                     >
                       <Copy className="size-5" />
@@ -245,7 +245,7 @@ export default function Reception() {
                     <Button
                       onClick={() => handleDownloadPDF(tab.title, tab.content)}
                       variant="outline"
-                      className="flex-1 gap-2 text-primary"
+                      className="flex-1 gap-2 text-primary transition-all duration-200 hover:scale-105"
                       aria-label="Baixar em PDF"
                     >
                       <Download className="size-5" />

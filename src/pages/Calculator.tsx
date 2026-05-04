@@ -257,22 +257,22 @@ export default function Calculator() {
         <Button
           variant="ghost"
           onClick={() => navigate('/dashboard')}
-          className="w-fit -ml-4"
+          className="w-fit -ml-4 transition-all duration-200 hover:scale-105"
           aria-label="Voltar para Dashboard"
         >
           <ArrowLeft className="size-5 mr-2" /> Voltar
         </Button>
-        <h1 className="text-2xl font-bold text-primary">Calculadora de Lucro Real</h1>
+        <h1 className="text-[24px] font-bold text-primary">Calculadora de Lucro Real</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card>
             <CardHeader className="pb-6">
-              <CardTitle className="text-lg font-semibold text-foreground">
+              <CardTitle className="text-[18px] font-semibold text-foreground">
                 Dados do Serviço
               </CardTitle>
-              <CardDescription className="text-base font-normal text-foreground">
+              <CardDescription className="text-[16px] font-normal text-foreground">
                 A fórmula calcula o lucro líquido por serviço:
                 <br />
                 <span className="font-mono text-sm mt-2 block bg-muted p-2 rounded">
@@ -284,7 +284,9 @@ export default function Calculator() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="servico">Nome do Serviço</Label>
+                  <Label htmlFor="servico" className="text-[14px] font-medium">
+                    Nome do Serviço
+                  </Label>
                   <Input
                     id="servico"
                     value={localForm.servico}
@@ -294,7 +296,9 @@ export default function Calculator() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="preco">Preço de Venda (R$)</Label>
+                  <Label htmlFor="preco" className="text-[14px] font-medium">
+                    Preço de Venda (R$)
+                  </Label>
                   <Input
                     id="preco"
                     type="number"
@@ -308,7 +312,9 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="insumos">Custo de Insumos (R$)</Label>
+                  <Label htmlFor="insumos" className="text-[14px] font-medium">
+                    Custo de Insumos (R$)
+                  </Label>
                   <Input
                     id="insumos"
                     type="number"
@@ -322,7 +328,10 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="impostos" className="flex items-center gap-2">
+                  <Label
+                    htmlFor="impostos"
+                    className="flex items-center gap-2 text-[14px] font-medium"
+                  >
                     Impostos (R$)
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -352,7 +361,9 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="comissao">Comissão (%)</Label>
+                  <Label htmlFor="comissao" className="text-[14px] font-medium">
+                    Comissão (%)
+                  </Label>
                   <Input
                     id="comissao"
                     type="number"
@@ -366,7 +377,9 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="tempo">Duração do Serviço (min)</Label>
+                  <Label htmlFor="tempo" className="text-[14px] font-medium">
+                    Duração do Serviço (min)
+                  </Label>
                   <Input
                     id="tempo"
                     type="number"
@@ -380,7 +393,9 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="custofixo">Custo Fixo Mensal (R$)</Label>
+                  <Label htmlFor="custofixo" className="text-[14px] font-medium">
+                    Custo Fixo Mensal (R$)
+                  </Label>
                   <Input
                     id="custofixo"
                     type="number"
@@ -396,7 +411,9 @@ export default function Calculator() {
                   </p>
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="minutos">Minutos Disponíveis no Mês</Label>
+                  <Label htmlFor="minutos" className="text-[14px] font-medium">
+                    Minutos Disponíveis no Mês
+                  </Label>
                   <Input
                     id="minutos"
                     type="number"
@@ -456,7 +473,11 @@ export default function Calculator() {
                 )}
               </div>
 
-              <Button onClick={handleSave} disabled={isSaving} className="w-full">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="w-full transition-all duration-200 hover:scale-105"
+              >
                 {isSaving ? (
                   <Loader2 className="size-5 mr-2 animate-spin" />
                 ) : (
@@ -471,7 +492,7 @@ export default function Calculator() {
         <div className="space-y-6">
           <Card className="overflow-hidden h-[400px]">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-semibold text-foreground">
+              <CardTitle className="text-[18px] font-semibold text-foreground">
                 Comparativo na Planilha
               </CardTitle>
             </CardHeader>
@@ -487,7 +508,7 @@ export default function Calculator() {
 
           <Card>
             <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4">
-              <CardTitle className="text-lg font-semibold text-foreground">
+              <CardTitle className="text-[18px] font-semibold text-foreground">
                 Últimos Cálculos
               </CardTitle>
               <Button
@@ -495,7 +516,7 @@ export default function Calculator() {
                 onClick={exportToCSV}
                 disabled={history.length === 0}
                 aria-label="Exportar para Excel"
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
               >
                 <Download className="size-5 mr-2" />{' '}
                 <span className="hidden sm:inline">Exportar para Excel</span>

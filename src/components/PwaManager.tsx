@@ -21,7 +21,7 @@ export function PwaManager() {
                       description: 'Atualize a página para acessar os novos recursos.',
                       action: (
                         <button
-                          className="bg-[#8B5CF6] text-white px-3 py-1 rounded text-sm hover:bg-purple-600 transition-colors"
+                          className="bg-[#8B5CF6] text-white px-3 py-1 rounded text-[14px] font-medium hover:bg-purple-600 transition-all duration-200 hover:scale-105"
                           onClick={() => window.location.reload()}
                         >
                           Atualizar
