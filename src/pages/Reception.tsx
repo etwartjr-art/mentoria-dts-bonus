@@ -1,344 +1,267 @@
-import { useState, useEffect } from 'react'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowLeft, Copy, Download } from 'lucide-react'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Copy, Edit2, PlayCircle, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { trackAccess } from '@/services/progress'
+import { useAuth } from '@/hooks/use-auth'
+import pb from '@/lib/pocketbase/client'
 
-// Interfaces and Mock Data
-interface VideoScript {
-  id: string
-  title: string
-  duration: string
-  description: string
-  script: string
-}
-
-const mockVideos: VideoScript[] = [
+const TABS = [
   {
-    id: 'mentalidade',
+    id: 'tab1',
+    label: 'Vídeo 1',
     title: 'A Mentalidade da Recepcionista de Elite',
-    duration: '5-7 minutos',
-    description: 'Descubra como uma recepcionista de elite pensa diferente e gera mais vendas',
-    script:
-      'Olá! Você sabe qual é a diferença entre uma recepcionista comum e uma de elite? Uma comum apenas anota recados, enquanto a de elite gera relacionamento e enxerga oportunidades. A de elite antecipa as necessidades da cliente e oferece soluções antes mesmo que ela peça. Resultado: Mais vendas, cliente mais satisfeito, salário maior.',
+    description:
+      'Assista e aprenda os 5 pilares que transformam uma recepção comum em uma máquina de vendas.',
+    content: `1. Primeira Impressão:
+A recepcionista é o primeiro e o último contato. O tom de voz e a postura definem o valor do serviço antes mesmo dele acontecer.
+
+2. Oportunidade de Venda:
+Enxergar além do agendamento. Identificar necessidades complementares e sugerir soluções proativamente.
+
+3. Controle do Fluxo:
+Gerenciar a agenda de forma estratégica, otimizando o tempo dos profissionais e reduzindo buracos.
+
+4. Confiança vs Desconto:
+Vender valor, não preço. Saber contornar pedidos de desconto reforçando a qualidade e o resultado esperado.
+
+5. Follow-up:
+O acompanhamento pós-serviço demonstra cuidado e gera retornos mais rápidos.
+
+AÇÃO IMEDIATA:
+Aplique hoje a regra da saudação com o nome da cliente e sorriso no rosto (mesmo ao telefone).`,
   },
   {
-    id: 'upsell',
-    title: 'Técnica de Upsell: Venda Cruzada Durante o Agendamento',
-    duration: '5-7 minutos',
-    description: 'Como oferecer serviços complementares sem parecer agressivo',
-    script:
-      'Upsell é oferecer um serviço complementar que agrega valor. Em vez de perguntar "Quer fazer mais alguma coisa?", diga "Notei que você agendou mechas. Para o loiro ficar perfeito, recomendamos o nosso protocolo de reconstrução rápida. Podemos incluir no seu agendamento?". Resultado: Ticket médio sobe 30-40%.',
+    id: 'tab2',
+    label: 'Vídeo 2',
+    title: 'Técnica de Upsell: Como Oferecer Mais Sem Parecer Ganancioso',
+    description:
+      'Aprenda a oferecer serviços complementares de forma natural e aumentar o ticket médio.',
+    content: `Passo a Passo:
+
+1. Escuta Ativa
+Entenda a dor ou o desejo da cliente durante o agendamento ou chegada.
+
+2. Oferta Natural
+"Como você vai fazer X, aproveita que o profissional Y está livre e já faz Z".
+
+3. Alternativa
+"Você prefere a opção A ou a B?" (Dê escolhas limitadas).
+
+4. Confirmação
+Reforce os benefícios da escolha.
+
+Exemplos de Upsell por Serviço:
+- Mechas -> Tratamento de reconstrução e nutrição.
+- Corte -> Finalização especial ou spa capilar.
+- Manicure -> Spa dos pés ou esmaltação em gel.
+
+REGRA DE OURO:
+O upsell deve parecer um conselho de especialista, não uma tentativa desesperada de empurrar serviço.
+
+AÇÃO IMEDIATA:
+Liste 3 combos de serviços do seu salão e treine a abordagem de oferta para cada um deles hoje.`,
   },
   {
-    id: 'homecare',
-    title: 'Venda de Produtos (Home Care) no Checkout',
-    duration: '5-7 minutos',
-    description: 'Técnica para vender produtos de cuidado em casa',
-    script:
-      'Home Care é o produto que o cliente usa em casa. Durante o pagamento, não pergunte se ela quer levar um produto. Diga: "Para manter esse resultado maravilhoso de hoje, nossa especialista separou esse kit de manutenção. Levando hoje, você economiza X%". Resultado: Venda adicional de R$ 80-150 por cliente.',
+    id: 'tab3',
+    label: 'Vídeo 3',
+    title: 'Venda de Produtos no Checkout: Home Care que Vende',
+    description:
+      'O checkout é o momento de ouro. Aprenda a vender produtos sem parecer insistente.',
+    content: `Fluxo de Checkout:
+
+1. Validação
+Elogie o resultado do serviço. "Seu cabelo ficou maravilhoso."
+
+2. Educação
+Explique que o cuidado em casa mantém o resultado do salão.
+
+3. Oferta
+"Para manter esse brilho, a especialista usou a linha X. Temos o kit disponível aqui."
+
+4. Alternativa
+Ofereça opções. "Temos o kit completo ou apenas a máscara. Qual você prefere?"
+
+5. Fechamento
+"Posso incluir no seu pagamento?"
+
+Exemplos de Preços e Ancoragem:
+"Esse tratamento no salão custa R$ 150 a sessão. Levando o kit hoje por R$ 199, você faz pelo menos 10 aplicações em casa."
+
+REGRA DE OURO:
+A venda do produto home care garante a durabilidade do serviço e a fidelização da cliente.
+
+AÇÃO IMEDIATA:
+Exponha os produtos perto do caixa e faça a oferta de um item de manutenção para cada cliente no momento do pagamento.`,
+  },
+  {
+    id: 'tab4',
+    label: 'Script WhatsApp',
+    title: 'Script WhatsApp: Recuperando Clientes Inativos (45+ dias)',
+    description: 'Use este script para trazer de volta clientes que desapareceram.',
+    content: `Contexto:
+Utilize para clientes que não visitam o salão há 45 dias ou mais.
+
+Mensagem 1 (Dia 45):
+"Oi [Nome]! 👋 Tudo bem? Notei que faz um tempo que você não vem nos visitar! Sabemos como o dia a dia é corrido, mas que tal tirar um tempinho para você? Preparamos uma condição especial para [Serviço]. Podemos agendar para essa semana?"
+
+Follow-up (Dia 50):
+"Oi [Nome], passando só para lembrar da nossa condição! Restam poucos horários na agenda desta semana. Posso reservar um para você?"
+
+Contorno de Objeções:
+- Tempo: "Podemos agendar no seu horário de almoço ou no fim do dia. Temos profissionais rápidos para te atender."
+- Outro lugar: "Entendo! Se um dia quiser experimentar nossa nova técnica, estamos sempre de portas abertas."
+- Preço: "Temos opções mais acessíveis que entregam um ótimo resultado. Quer dar uma olhada no nosso menu de serviços?"
+
+Confirmação de Sucesso:
+"Perfeito! Horário agendado para [Dia/Hora]. Te esperamos com um café quentinho! ☕"
+
+REGRA DE OURO:
+Nunca pareça que está cobrando a cliente, e sim que sentiu falta dela e quer cuidar dela.
+
+DICAS:
+- Personalize sempre com o nome da cliente.
+- Use áudios curtos para gerar mais conexão se a cliente for mais próxima.
+- Utilize emojis moderadamente.`,
   },
 ]
 
-const WHATSAPP_BASE_SCRIPT =
-  'Oi [Nome]! 👋 Tudo bem? Notei que faz um tempo que você não vem nos visitar! 😊 Sabemos como o dia a dia é corrido, mas que tal tirar um tempinho para você? Preparamos uma oferta especial de [Promoção 1] por apenas [Preço Promo 1]! Podemos agendar para essa semana? Confirma aí! 💅'
-
-// Subcomponents
-function VideoCardItem({ video }: { video: VideoScript }) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <Card className="border-purple-200 bg-purple-50/30 dark:border-purple-900/50 dark:bg-purple-900/10 flex flex-col h-full transition-all hover:border-purple-300 dark:hover:border-purple-800">
-      <CardHeader>
-        <CardTitle className="text-lg text-purple-800 dark:text-purple-300 leading-tight">
-          {video.title}
-        </CardTitle>
-        <CardDescription className="font-medium text-purple-600/80 dark:text-purple-400/80">
-          {video.duration}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 space-y-4">
-        <p className="text-sm text-foreground/80">{video.description}</p>
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full border-purple-200 text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 flex justify-between"
-            >
-              {isOpen ? 'Ocultar Script' : 'Ver Script'}
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4 ml-2" />
-              ) : (
-                <ChevronDown className="h-4 w-4 ml-2" />
-              )}
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-3 overflow-hidden data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:animate-in data-[state=open]:fade-in">
-            <div className="p-3 bg-white dark:bg-background rounded-md border border-purple-100 dark:border-purple-800 text-sm italic text-foreground/90 leading-relaxed shadow-sm">
-              "{video.script}"
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </CardContent>
-      <CardFooter>
-        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white gap-2" asChild>
-          <a href="#" target="_blank" rel="noopener noreferrer">
-            <PlayCircle className="h-4 w-4" />
-            Assistir no YouTube
-          </a>
-        </Button>
-      </CardFooter>
-    </Card>
-  )
-}
-
 export default function Reception() {
   const { toast } = useToast()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [videos, setVideos] = useState<VideoScript[]>([])
-
-  // WhatsApp States
-  const [nome, setNome] = useState('')
-  const [promocao, setPromocao] = useState('')
-  const [preco, setPreco] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { user, loading } = useAuth()
 
   useEffect(() => {
-    trackAccess?.('recepcao')
+    if (loading || !user) return
 
-    let isMounted = true
-    const fetchData = async () => {
+    const trackAccess = async () => {
       try {
-        setLoading(true)
-        setError(false)
-        // Simulate fetch delay
-        await new Promise((r) => setTimeout(r, 800))
-        if (isMounted) setVideos(mockVideos)
+        await pb.collection('bonus_acesso').create({
+          user: user.id,
+          tipo_bonus: 'recepcao',
+        })
       } catch {
-        if (isMounted) setError(true)
-      } finally {
-        if (isMounted) setLoading(false)
+        // Silently fail if tracking fails or if uniqueness constraint prevents duplicates
       }
     }
+    trackAccess()
+  }, [user, loading])
 
-    fetchData()
-    return () => {
-      isMounted = false
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast({
+        title: 'Copiado!',
+        description: 'Conteúdo copiado para a área de transferência.',
+      })
+    } catch {
+      toast({
+        title: 'Erro',
+        description: 'Falha ao copiar. Tente novamente.',
+        variant: 'destructive',
+      })
     }
-  }, [])
-
-  const getCustomScript = () => {
-    let script = WHATSAPP_BASE_SCRIPT
-    script = script.replace('[Nome]', nome || '[Nome]')
-    script = script.replace('[Promoção 1]', promocao || '[Promoção 1]')
-    script = script.replace('[Preço Promo 1]', preco || '[Preço Promo 1]')
-    return script
   }
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast({
-      title: 'Script copiado!',
-      description: 'O script foi copiado para a área de transferência com sucesso.',
-      duration: 3000,
-    })
-    setIsModalOpen(false)
-  }
+  const handleDownloadPDF = (title: string, content: string) => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
 
-  if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto space-y-12 p-4 sm:p-6 animate-fade-in-up">
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-5 w-full max-w-xl" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-1/4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-24 w-full" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-6 w-1/3" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-32 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 animate-fade-in-up">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Erro</AlertTitle>
-          <AlertDescription>Erro ao carregar. Tente novamente.</AlertDescription>
-        </Alert>
-        <Button onClick={() => window.location.reload()} className="mt-4">
-          Tentar Novamente
-        </Button>
-      </div>
-    )
-  }
-
-  if (!videos.length) {
-    return (
-      <div className="max-w-6xl mx-auto p-4 sm:p-6 animate-fade-in-up">
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Aviso</AlertTitle>
-          <AlertDescription>Nenhum script disponível.</AlertDescription>
-        </Alert>
-      </div>
-    )
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: sans-serif; line-height: 1.6; color: #111; padding: 40px; max-width: 800px; margin: 0 auto; }
+            h1 { color: #000; font-size: 24px; margin-bottom: 24px; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+            pre { white-space: pre-wrap; font-family: inherit; font-size: 14px; background: #f9f9f9; padding: 24px; border-radius: 8px; border: 1px solid #eee; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <pre>${content}</pre>
+          <script>
+            window.onload = () => {
+              window.print();
+              setTimeout(() => window.close(), 500);
+            };
+          </script>
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 animate-fade-in-up p-4 sm:p-6">
-      <div className="space-y-2">
-        <h1 className="font-heading text-3xl font-bold tracking-tight">Recepção que Vende</h1>
-        <p className="text-muted-foreground text-lg">
-          Transforme sua recepção no coração estratégico de vendas do seu negócio.
-        </p>
-      </div>
-
-      <section className="space-y-6">
-        <h2 className="text-2xl font-bold font-heading text-purple-900 dark:text-purple-400">
-          3 Vídeos: Técnicas de Venda para Recepcionista
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {videos.map((video) => (
-            <VideoCardItem key={video.id} video={video} />
-          ))}
+    <div className="min-h-screen bg-background text-foreground pb-20">
+      <header className="border-b bg-card">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
+          <Button variant="ghost" size="icon" asChild className="shrink-0">
+            <Link to="/dashboard">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="sr-only">Voltar</span>
+            </Link>
+          </Button>
+          <h1 className="font-heading text-xl font-bold">Recepção que Vende</h1>
         </div>
-      </section>
+      </header>
 
-      <section className="space-y-6 pt-4">
-        <Card className="border-orange-200 bg-orange-50/30 dark:border-orange-900/50 dark:bg-orange-900/10 transition-all hover:border-orange-300 dark:hover:border-orange-800">
-          <CardHeader>
-            <CardTitle className="text-xl text-orange-800 dark:text-orange-400">
-              Script WhatsApp: Recuperando Clientes (45+ dias sem vir)
-            </CardTitle>
-            <CardDescription className="text-orange-700/80 dark:text-orange-300/80">
-              Utilize esta mensagem para atrair de volta clientes que não visitam o salão há algum
-              tempo.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 bg-white dark:bg-background rounded-md border border-orange-100 dark:border-orange-800 text-base whitespace-pre-wrap leading-relaxed shadow-sm text-foreground/90">
-              {WHATSAPP_BASE_SCRIPT}
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col sm:flex-row gap-4">
-            <Button
-              onClick={() => handleCopy(WHATSAPP_BASE_SCRIPT)}
-              className="bg-orange-600 hover:bg-orange-700 text-white w-full sm:flex-1 gap-2"
-            >
-              <Copy className="h-4 w-4" />
-              Copiar Script Base
-            </Button>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 animate-fade-in-up">
+        <Tabs defaultValue={TABS[0].id} className="w-full">
+          <TabsList className="w-full flex flex-wrap h-auto justify-start mb-6 rounded-lg bg-muted/50 p-1">
+            {TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="flex-1 min-w-[120px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-orange-200 text-orange-700 hover:bg-orange-100 dark:border-orange-800 dark:text-orange-300 dark:hover:bg-orange-900/50 w-full sm:flex-1 gap-2"
-                >
-                  <Edit2 className="h-4 w-4" />
-                  Personalizar
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Personalizar Script WhatsApp</DialogTitle>
-                  <DialogDescription>
-                    Preencha os campos abaixo para gerar uma mensagem exclusiva.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="nome">Nome do Cliente</Label>
-                    <Input
-                      id="nome"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      placeholder="Ex: Ana Maria"
-                    />
+          {TABS.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className="mt-0 outline-none">
+              <Card className="border-border/50 shadow-sm">
+                <CardHeader className="bg-muted/30 border-b pb-6">
+                  <CardTitle className="text-2xl font-bold text-primary">{tab.title}</CardTitle>
+                  <CardDescription className="text-base text-foreground/70 mt-2">
+                    {tab.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-6 mb-6 border shadow-inner">
+                    <pre className="whitespace-pre-wrap font-sans text-sm md:text-base leading-relaxed text-foreground/90">
+                      {tab.content}
+                    </pre>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="promocao">Promoção 1</Label>
-                    <Input
-                      id="promocao"
-                      value={promocao}
-                      onChange={(e) => setPromocao(e.target.value)}
-                      placeholder="Ex: Combo Mechas + Hidratação"
-                    />
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button
+                      onClick={() => handleCopy(tab.content)}
+                      className="flex-1 gap-2"
+                      size="lg"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copiar Script
+                    </Button>
+                    <Button
+                      onClick={() => handleDownloadPDF(tab.title, tab.content)}
+                      variant="outline"
+                      className="flex-1 gap-2 border-primary text-primary hover:text-primary-foreground hover:bg-primary"
+                      size="lg"
+                    >
+                      <Download className="h-4 w-4" />
+                      Baixar em PDF
+                    </Button>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="preco">Preço Promo 1</Label>
-                    <Input
-                      id="preco"
-                      value={preco}
-                      onChange={(e) => setPreco(e.target.value)}
-                      placeholder="Ex: R$ 399,90"
-                    />
-                  </div>
-                  <div className="mt-4 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-md border border-orange-100 dark:border-orange-900/50 text-sm whitespace-pre-wrap leading-relaxed text-foreground/90">
-                    {getCustomScript()}
-                  </div>
-                </div>
-                <DialogFooter className="flex-col sm:flex-row gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button
-                    onClick={() => handleCopy(getCustomScript())}
-                    className="bg-orange-600 hover:bg-orange-700 text-white gap-2"
-                  >
-                    <Copy className="h-4 w-4" />
-                    Copiar e Fechar
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </CardFooter>
-        </Card>
-      </section>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </main>
     </div>
   )
 }
