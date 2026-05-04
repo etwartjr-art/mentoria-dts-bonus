@@ -76,7 +76,7 @@ export default function Calculator() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 
-  const [form, setForm] = useState({
+  const [localForm, setLocalForm] = useState({
     servico: '',
     preco_venda: '',
     custo_insumos: '',
@@ -86,6 +86,15 @@ export default function Calculator() {
     custo_fixo_mensal: '',
     minutos_disponiveis: '',
   })
+
+  const [form, setForm] = useState(localForm)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setForm(localForm)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [localForm])
 
   const loadHistory = useCallback(async () => {
     if (!user) return
@@ -129,14 +138,14 @@ export default function Calculator() {
 
   const handleSave = async () => {
     if (
-      !form.servico ||
-      !form.preco_venda ||
-      !form.custo_insumos ||
-      !form.impostos ||
-      !form.comissao ||
-      !form.tempo ||
-      !form.custo_fixo_mensal ||
-      !form.minutos_disponiveis
+      !localForm.servico ||
+      !localForm.preco_venda ||
+      !localForm.custo_insumos ||
+      !localForm.impostos ||
+      !localForm.comissao ||
+      !localForm.tempo ||
+      !localForm.custo_fixo_mensal ||
+      !localForm.minutos_disponiveis
     ) {
       return toast.error('Preencha todos os campos')
     }
@@ -147,7 +156,7 @@ export default function Calculator() {
     setIsSaving(true)
     try {
       await createDadosCalculadora({
-        servico: form.servico,
+        servico: localForm.servico,
         preco_venda: pVenda,
         custo_insumos: cInsumos,
         impostos,
@@ -221,7 +230,7 @@ export default function Calculator() {
         <h1 className="text-2xl font-bold text-primary">Calculadora de Lucro Real</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="space-y-6">
           <Card>
             <CardHeader className="pb-6">
@@ -243,8 +252,8 @@ export default function Calculator() {
                   <Label htmlFor="servico">Nome do Serviço</Label>
                   <Input
                     id="servico"
-                    value={form.servico}
-                    onChange={(e) => setForm({ ...form, servico: e.target.value })}
+                    value={localForm.servico}
+                    onChange={(e) => setLocalForm({ ...localForm, servico: e.target.value })}
                     placeholder="Ex: Escova Progressiva"
                     aria-label="Nome do Serviço"
                   />
@@ -254,8 +263,8 @@ export default function Calculator() {
                   <Input
                     id="preco"
                     type="number"
-                    value={form.preco_venda}
-                    onChange={(e) => setForm({ ...form, preco_venda: e.target.value })}
+                    value={localForm.preco_venda}
+                    onChange={(e) => setLocalForm({ ...localForm, preco_venda: e.target.value })}
                     placeholder="ex: 150"
                     aria-label="Preço de Venda"
                   />
@@ -268,8 +277,8 @@ export default function Calculator() {
                   <Input
                     id="insumos"
                     type="number"
-                    value={form.custo_insumos}
-                    onChange={(e) => setForm({ ...form, custo_insumos: e.target.value })}
+                    value={localForm.custo_insumos}
+                    onChange={(e) => setLocalForm({ ...localForm, custo_insumos: e.target.value })}
                     placeholder="ex: 20"
                     aria-label="Custo de Insumos"
                   />
@@ -282,7 +291,13 @@ export default function Calculator() {
                     Impostos (R$)
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Info className="size-5 text-muted-foreground cursor-help" />
+                        <button
+                          type="button"
+                          className="inline-flex"
+                          aria-label="Informação sobre impostos"
+                        >
+                          <Info className="size-5 text-muted-foreground cursor-help" />
+                        </button>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Consulte seu contador para valor exato</p>
@@ -292,8 +307,8 @@ export default function Calculator() {
                   <Input
                     id="impostos"
                     type="number"
-                    value={form.impostos}
-                    onChange={(e) => setForm({ ...form, impostos: e.target.value })}
+                    value={localForm.impostos}
+                    onChange={(e) => setLocalForm({ ...localForm, impostos: e.target.value })}
                     placeholder="ex: 22.5"
                     aria-label="Impostos"
                   />
@@ -306,8 +321,8 @@ export default function Calculator() {
                   <Input
                     id="comissao"
                     type="number"
-                    value={form.comissao}
-                    onChange={(e) => setForm({ ...form, comissao: e.target.value })}
+                    value={localForm.comissao}
+                    onChange={(e) => setLocalForm({ ...localForm, comissao: e.target.value })}
                     placeholder="ex: 50"
                     aria-label="Comissão"
                   />
@@ -320,8 +335,8 @@ export default function Calculator() {
                   <Input
                     id="tempo"
                     type="number"
-                    value={form.tempo}
-                    onChange={(e) => setForm({ ...form, tempo: e.target.value })}
+                    value={localForm.tempo}
+                    onChange={(e) => setLocalForm({ ...localForm, tempo: e.target.value })}
                     placeholder="ex: 60"
                     aria-label="Duração do Serviço"
                   />
@@ -334,8 +349,10 @@ export default function Calculator() {
                   <Input
                     id="custofixo"
                     type="number"
-                    value={form.custo_fixo_mensal}
-                    onChange={(e) => setForm({ ...form, custo_fixo_mensal: e.target.value })}
+                    value={localForm.custo_fixo_mensal}
+                    onChange={(e) =>
+                      setLocalForm({ ...localForm, custo_fixo_mensal: e.target.value })
+                    }
                     placeholder="ex: 5000"
                     aria-label="Custo Fixo Mensal"
                   />
@@ -348,8 +365,10 @@ export default function Calculator() {
                   <Input
                     id="minutos"
                     type="number"
-                    value={form.minutos_disponiveis}
-                    onChange={(e) => setForm({ ...form, minutos_disponiveis: e.target.value })}
+                    value={localForm.minutos_disponiveis}
+                    onChange={(e) =>
+                      setLocalForm({ ...localForm, minutos_disponiveis: e.target.value })
+                    }
                     placeholder="ex: 10560"
                     aria-label="Minutos Disponíveis"
                   />
@@ -373,7 +392,9 @@ export default function Calculator() {
               </div>
 
               <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 space-y-4">
-                <h3 className="text-2xl font-bold text-primary">Resultado Final</h3>
+                <h3 className="text-[20px] lg:text-[24px] font-bold text-primary">
+                  Resultado Final
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <p className="text-sm font-medium text-muted-foreground">
@@ -429,7 +450,7 @@ export default function Calculator() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-6">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4">
               <CardTitle className="text-lg font-semibold text-foreground">
                 Últimos Cálculos
               </CardTitle>
@@ -438,8 +459,11 @@ export default function Calculator() {
                 onClick={exportToCSV}
                 disabled={history.length === 0}
                 aria-label="Exportar para Excel"
+                className="w-full sm:w-auto"
               >
-                <Download className="size-5 mr-2" /> Exportar para Excel
+                <Download className="size-5 mr-2" />{' '}
+                <span className="hidden sm:inline">Exportar para Excel</span>
+                <span className="sm:hidden">Exportar</span>
               </Button>
             </CardHeader>
             <CardContent>
@@ -450,30 +474,61 @@ export default function Calculator() {
                   Nenhum cálculo salvo ainda.
                 </p>
               ) : (
-                <div className="border rounded-md overflow-hidden">
-                  <Table>
-                    <TableHeader className="bg-secondary/50">
-                      <TableRow>
-                        <TableHead>Serviço</TableHead>
-                        <TableHead>Preço</TableHead>
-                        <TableHead>Lucro</TableHead>
-                        <TableHead>Margem</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {history.map((item) => (
-                        <TableRow key={item.id}>
-                          <TableCell className="font-medium truncate max-w-[100px]">
-                            {item.servico}
-                          </TableCell>
-                          <TableCell>{formatCurrency(item.preco_venda)}</TableCell>
-                          <TableCell>{formatCurrency(item.lucro_liquido)}</TableCell>
-                          <TableCell>{item.margem_lucro?.toFixed(2)}%</TableCell>
+                <>
+                  <div className="hidden sm:block border rounded-md overflow-auto">
+                    <Table>
+                      <TableHeader className="bg-secondary/50">
+                        <TableRow>
+                          <TableHead>Serviço</TableHead>
+                          <TableHead>Preço</TableHead>
+                          <TableHead>Lucro</TableHead>
+                          <TableHead>Margem</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {history.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium truncate max-w-[100px]">
+                              {item.servico}
+                            </TableCell>
+                            <TableCell>{formatCurrency(item.preco_venda)}</TableCell>
+                            <TableCell>{formatCurrency(item.lucro_liquido)}</TableCell>
+                            <TableCell>{item.margem_lucro?.toFixed(2)}%</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  <div className="sm:hidden space-y-4">
+                    {history.map((item) => (
+                      <div
+                        key={item.id}
+                        className="bg-card border rounded-lg p-4 space-y-2 shadow-sm"
+                      >
+                        <div className="flex justify-between items-center pb-2 border-b">
+                          <span className="font-bold text-[16px] truncate max-w-[150px] text-primary">
+                            {item.servico}
+                          </span>
+                          <span className="text-[14px] font-medium bg-secondary/10 text-secondary px-2 py-1 rounded">
+                            {item.margem_lucro?.toFixed(2)}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center pt-1">
+                          <span className="text-[14px] text-muted-foreground">Preço:</span>
+                          <span className="text-[14px] font-medium">
+                            {formatCurrency(item.preco_venda)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[14px] text-muted-foreground">Lucro:</span>
+                          <span className="text-[14px] font-medium text-success">
+                            {formatCurrency(item.lucro_liquido)}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

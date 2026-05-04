@@ -54,6 +54,12 @@
     color: hsl(var(--foreground));
     font-family: 'Inter', sans-serif;
   }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    content-visibility: auto;
+  }
 }
 
 @layer utilities {

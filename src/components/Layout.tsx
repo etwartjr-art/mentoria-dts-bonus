@@ -1,34 +1,35 @@
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/use-auth'
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarInset,
-} from '@/components/ui/sidebar'
-import { Crown, ClipboardList, BarChart, Clapperboard, LayoutDashboard, LogOut } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+  Crown,
+  ClipboardList,
+  BarChart,
+  Clapperboard,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useState, useEffect } from 'react'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Kit Jurídico', href: '/kit-juridico', icon: ClipboardList },
-  { name: 'Calculadora de Lucro', href: '/calculadora', icon: BarChart },
-  { name: 'Recepção que Vende', href: '/recepcao-vende', icon: Clapperboard },
+  { name: 'Calculadora', href: '/calculadora', icon: BarChart },
+  { name: 'Recepção', href: '/recepcao-vende', icon: Clapperboard },
 ]
 
 export default function Layout() {
   const location = useLocation()
   const { user, loading, signOut } = useAuth()
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Close sheet on route change
+  useEffect(() => {
+    setIsOpen(false)
+  }, [location.pathname])
 
   if (loading) {
     return (
@@ -42,88 +43,112 @@ export default function Layout() {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  const initials = user.name
-    ? user.name
-        .split(' ')
-        .map((n: string) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : 'U'
-
   return (
-    <SidebarProvider>
-      <Sidebar variant="inset" className="border-r-border/50">
-        <SidebarHeader className="p-4 flex flex-row items-center gap-3">
-          <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-            <Crown className="size-6" />
-          </div>
-          <div className="flex flex-col gap-0.5 leading-none">
-            <span className="text-xl font-bold text-primary">DTS Mentoria</span>
-            <span className="text-sm font-medium text-muted-foreground">High-Ticket Beauty</span>
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-muted-foreground uppercase text-xs tracking-wider">
-              Bônus Exclusivos
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-50 flex h-[56px] lg:h-[64px] shrink-0 items-center justify-between border-b border-border bg-white px-4 sm:px-5 lg:px-8 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden h-11 w-11"
+                aria-label="Abrir Menu"
+              >
+                <Menu className="size-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <SheetHeader className="text-left border-b pb-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+                    <Crown className="size-6" />
+                  </div>
+                  <div className="flex flex-col gap-0.5 leading-none">
+                    <SheetTitle className="text-xl font-bold text-primary m-0">
+                      DTS Mentoria
+                    </SheetTitle>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      High-Ticket Beauty
+                    </span>
+                  </div>
+                </div>
+              </SheetHeader>
+              <nav className="flex flex-col gap-2">
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">
+                  Bônus Exclusivos
+                </div>
                 {navigation.map((item) => (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.href}
-                      className="hover:bg-primary/10 hover:text-primary transition-colors data-[active=true]:bg-primary/20 data-[active=true]:text-primary data-[active=true]:font-semibold"
-                    >
-                      <Link to={item.href}>
-                        <item.icon className="size-4" />
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-3 text-[16px] font-medium transition-colors ${
+                      location.pathname === item.href
+                        ? 'bg-primary/20 text-primary font-semibold'
+                        : 'text-foreground hover:bg-primary/10 hover:text-primary active:bg-primary/20'
+                    }`}
+                  >
+                    <item.icon className="size-5" />
+                    {item.name}
+                  </Link>
                 ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-white px-4 md:px-8 shadow-sm z-10 relative">
-          <div className="flex items-center gap-4">
-            <SidebarTrigger className="-ml-1" aria-label="Abrir Menu" />
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <Crown className="size-6 text-primary" />
-              <h1 className="text-xl font-bold text-primary hidden sm:block">DTS Mentoria</h1>
-            </Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-base font-normal text-foreground hidden sm:inline-block">
-              {user.name || user.email}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <Crown className="size-6 text-primary lg:size-7" />
+            <span className="text-[20px] lg:text-[24px] font-bold text-primary hidden sm:block">
+              DTS Mentoria
             </span>
-            <Button
-              variant="outline"
-              onClick={signOut}
-              className="text-foreground hover:text-primary transition-colors duration-200"
-              aria-label="Sair"
-            >
-              <LogOut className="size-5 mr-2 hidden sm:inline-block" />
-              Sair
-            </Button>
-          </div>
-        </header>
-        <main className="flex-1 overflow-auto bg-background animate-fade-in flex flex-col">
-          <div className="px-4 md:px-8 py-8 flex-1">
-            <Outlet />
-          </div>
-          <footer className="p-4 border-t border-border bg-white mt-auto">
-            <p className="text-center text-muted-foreground text-sm font-medium">
-              &copy; {new Date().getFullYear()} DTS Mentoria
-            </p>
-          </footer>
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1 ml-6">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-[16px] font-medium transition-colors ${
+                  location.pathname === item.href
+                    ? 'bg-primary/10 text-primary font-semibold'
+                    : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                }`}
+              >
+                <item.icon className="size-4" />
+                {item.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-3 sm:gap-4">
+          <span className="text-[16px] font-normal text-foreground hidden sm:inline-block max-w-[150px] truncate">
+            {user.name || user.email}
+          </span>
+          <Button
+            variant="outline"
+            onClick={signOut}
+            className="text-foreground hover:text-primary active:scale-95 transition-all duration-200"
+            aria-label="Sair"
+          >
+            <LogOut className="size-5 sm:mr-2" />
+            <span className="hidden sm:inline-block text-[16px]">Sair</span>
+          </Button>
+        </div>
+      </header>
+
+      <main className="flex-1 overflow-auto bg-background animate-fade-in flex flex-col p-4 sm:p-5 lg:p-8">
+        <div className="mx-auto w-full max-w-6xl flex-1">
+          <Outlet />
+        </div>
+      </main>
+
+      <footer className="p-4 border-t border-border bg-white mt-auto">
+        <p className="text-center text-muted-foreground text-[14px] font-medium">
+          &copy; {new Date().getFullYear()} DTS Mentoria
+        </p>
+      </footer>
+    </div>
   )
 }

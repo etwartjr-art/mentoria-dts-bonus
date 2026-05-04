@@ -6,7 +6,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-105 hover:shadow-md [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:hover:scale-105 sm:hover:shadow-md active:scale-95 [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
@@ -16,8 +16,8 @@ const buttonVariants = cva(
           'border border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost:
-          'text-foreground hover:bg-accent hover:text-accent-foreground shadow-none hover:shadow-none hover:scale-100',
-        link: 'text-primary underline-offset-4 hover:underline shadow-none hover:shadow-none hover:scale-100',
+          'text-foreground hover:bg-accent hover:text-accent-foreground shadow-none sm:hover:shadow-none sm:hover:scale-100',
+        link: 'text-primary underline-offset-4 hover:underline shadow-none sm:hover:shadow-none sm:hover:scale-100',
       },
       size: {
         default: 'h-[44px] px-4 py-2',

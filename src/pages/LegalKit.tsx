@@ -206,7 +206,7 @@ export default function LegalKit() {
       </div>
       <div className="max-w-6xl mx-auto space-y-8 animate-fade-in print:hidden">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-primary tracking-tight">
+          <h1 className="text-[20px] lg:text-[24px] font-bold text-primary tracking-tight leading-tight">
             Kit de Sobrevivência Jurídica
           </h1>
           <p className="text-base font-normal text-foreground">
@@ -269,9 +269,9 @@ export default function LegalKit() {
 
             {/* Common Errors */}
             <div className="space-y-4">
-              <h3 className="text-xl font-bold flex items-center gap-2 text-destructive">
-                <AlertTriangle className="size-6" />3 Erros Jurídicos que Levam a Processos
-                Trabalhistas
+              <h3 className="text-[20px] lg:text-[24px] font-bold flex items-center gap-2 text-destructive leading-tight">
+                <AlertTriangle className="size-6 shrink-0" />
+                <span>3 Erros Jurídicos que Levam a Processos Trabalhistas</span>
               </h3>
               <div className="grid gap-4 sm:grid-cols-1">
                 {errors.map((error, idx) => (
@@ -340,7 +340,7 @@ export default function LegalKit() {
               <CardFooter className="flex flex-col gap-3">
                 <Button
                   onClick={handleDownloadNda}
-                  className="w-full bg-success text-success-foreground hover:bg-success/90"
+                  className="w-full bg-success text-success-foreground hover:bg-success/90 min-h-[44px]"
                 >
                   <FileDown className="size-5 mr-2" />
                   Baixar PDF / Imprimir

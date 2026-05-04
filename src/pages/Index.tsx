@@ -134,8 +134,8 @@ export default function Index() {
             <Sparkles className="size-5" />
             <span>Conteúdo Exclusivo</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
-            Bem-vindo ao seu <br />
+          <h1 className="text-[24px] lg:text-[32px] font-bold tracking-tight text-primary leading-tight">
+            Bem-vindo ao seu <br className="hidden sm:block" />
             <span className="text-foreground">Dashboard de Elite</span>
           </h1>
           <p className="text-base text-foreground font-normal">
@@ -147,7 +147,7 @@ export default function Index() {
       </section>
 
       {/* Modules Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {modules.map((mod) => (
           <Card
             key={mod.href}
@@ -170,7 +170,9 @@ export default function Index() {
                   </Badge>
                 )}
               </div>
-              <CardTitle className="text-xl font-bold text-primary">{mod.title}</CardTitle>
+              <CardTitle className="text-[20px] lg:text-[24px] font-bold text-primary leading-tight">
+                {mod.title}
+              </CardTitle>
               <CardDescription className="text-base font-normal text-foreground mt-2">
                 {mod.description}
               </CardDescription>
@@ -188,8 +190,10 @@ export default function Index() {
       </section>
 
       {/* Quick Tips */}
-      <section className="rounded-xl border border-border bg-muted p-6">
-        <h3 className="text-xl font-bold mb-4 text-primary">Dicas de Ouro para o Sucesso</h3>
+      <section className="rounded-xl border border-border bg-muted p-6 mt-6">
+        <h3 className="text-[20px] lg:text-[24px] font-bold mb-4 text-primary">
+          Dicas de Ouro para o Sucesso
+        </h3>
         <ul className="space-y-2 text-base text-foreground font-normal list-disc list-inside">
           <li>Sempre adapte os scripts de vendas para o seu tom de voz e da sua marca.</li>
           <li>Revise seu custo por minuto a cada 3 meses para não perder margem de lucro.</li>
