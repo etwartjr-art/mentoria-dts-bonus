@@ -204,12 +204,12 @@ export default function LegalKit() {
       <div className="hidden print:block p-8 font-sans text-black whitespace-pre-wrap">
         {ndaText}
       </div>
-      <div className="max-w-6xl mx-auto space-y-8 animate-fade-in-up p-4 print:hidden">
+      <div className="max-w-6xl mx-auto space-y-8 animate-fade-in print:hidden">
         <div className="space-y-2">
-          <h1 className="font-heading text-3xl font-bold tracking-tight">
+          <h1 className="text-2xl font-bold text-primary tracking-tight">
             Kit de Sobrevivência Jurídica
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-base font-normal text-foreground">
             Proteja seu negócio de passivos trabalhistas com os fundamentos corretos.
           </p>
         </div>
@@ -218,15 +218,15 @@ export default function LegalKit() {
           {/* Left Column (Checklist and Errors) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Checklist */}
-            <Card className="border-blue-500/20 bg-blue-500/5 shadow-sm">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
-                  <CheckCircle2 className="size-5" />
-                  <CardTitle>
+            <Card>
+              <CardHeader className="pb-6">
+                <div className="flex items-center gap-2 text-primary">
+                  <CheckCircle2 className="size-6" />
+                  <CardTitle className="text-lg font-semibold text-foreground">
                     Checklist: Cláusulas Obrigatórias no Contrato de Salão Parceiro
                   </CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-base font-normal text-foreground mt-2">
                   Verifique se o seu contrato contempla todos os itens exigidos pela Lei
                   13.352/2016.
                 </CardDescription>
@@ -259,7 +259,7 @@ export default function LegalKit() {
               <CardFooter>
                 <Button
                   variant={checklistCompleto ? 'secondary' : 'default'}
-                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full sm:w-auto"
                   onClick={toggleCompleteAll}
                 >
                   {checklistCompleto ? 'Desmarcar Todos' : 'Marcar como completo'}
@@ -269,34 +269,35 @@ export default function LegalKit() {
 
             {/* Common Errors */}
             <div className="space-y-4">
-              <h3 className="font-heading text-2xl font-semibold flex items-center gap-2 text-red-600 dark:text-red-400">
+              <h3 className="text-xl font-bold flex items-center gap-2 text-destructive">
                 <AlertTriangle className="size-6" />3 Erros Jurídicos que Levam a Processos
                 Trabalhistas
               </h3>
               <div className="grid gap-4 sm:grid-cols-1">
                 {errors.map((error, idx) => (
-                  <Card key={idx} className="border-red-500/20 bg-red-500/5">
+                  <Card key={idx} className="border-destructive/20 bg-destructive/5">
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value={`error-${idx}`} className="border-b-0">
-                        <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-red-500/10 rounded-t-lg transition-colors">
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-destructive/10 rounded-t-xl transition-colors">
                           <div className="flex flex-col items-start text-left gap-1">
-                            <span className="font-semibold text-red-700 dark:text-red-400">
+                            <span className="text-lg font-semibold text-destructive">
                               {error.title}
                             </span>
-                            <span className="text-sm text-muted-foreground font-normal">
+                            <span className="text-base font-normal text-foreground">
                               {error.summary}
                             </span>
                           </div>
                         </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 pt-2">
-                          <p className="text-sm leading-relaxed mb-4">{error.description}</p>
+                        <AccordionContent className="px-6 pb-6 pt-2">
+                          <p className="text-base font-normal leading-relaxed mb-4">
+                            {error.description}
+                          </p>
                           <Button
                             variant="outline"
-                            size="sm"
-                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            className="text-destructive border-destructive/20 hover:bg-destructive/10 h-9 px-3"
                             onClick={() => handleShare(error.title, error.description)}
                           >
-                            <Share2 className="size-4 mr-2" />
+                            <Share2 className="size-5 mr-2" />
                             Compartilhar
                           </Button>
                         </AccordionContent>
@@ -310,24 +311,26 @@ export default function LegalKit() {
 
           {/* Right Column (NDA) */}
           <div className="space-y-6">
-            <Card className="border-green-500/20 bg-green-500/5 shadow-sm sticky top-6">
-              <CardHeader>
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                  <Scale className="size-5" />
-                  <CardTitle>Modelo de NDA - Acordo de Confidencialidade</CardTitle>
+            <Card className="sticky top-6 border-success/20 bg-success/5">
+              <CardHeader className="pb-6">
+                <div className="flex items-center gap-2 text-success">
+                  <Scale className="size-6" />
+                  <CardTitle className="text-lg font-semibold text-success">
+                    Modelo de NDA
+                  </CardTitle>
                 </div>
-                <CardDescription>
+                <CardDescription className="text-base font-normal text-foreground mt-2">
                   Acordo de Confidencialidade para proteger sua base de clientes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="nda" className="border-border">
-                    <AccordionTrigger className="text-sm font-medium hover:no-underline">
+                    <AccordionTrigger className="text-base font-semibold hover:no-underline">
                       Ver texto do contrato
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="mt-4 p-4 bg-background border rounded-md text-xs font-mono whitespace-pre-wrap text-muted-foreground max-h-[400px] overflow-y-auto">
+                      <div className="mt-4 p-4 bg-background border rounded-md text-sm font-mono whitespace-pre-wrap text-foreground max-h-[400px] overflow-y-auto">
                         {ndaText}
                       </div>
                     </AccordionContent>
@@ -337,14 +340,14 @@ export default function LegalKit() {
               <CardFooter className="flex flex-col gap-3">
                 <Button
                   onClick={handleDownloadNda}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  className="w-full bg-success text-success-foreground hover:bg-success/90"
                 >
-                  <FileDown className="size-4 mr-2" />
+                  <FileDown className="size-5 mr-2" />
                   Baixar PDF / Imprimir
                 </Button>
                 {ndaBaixado && (
-                  <p className="text-xs text-green-600 text-center flex items-center justify-center gap-1">
-                    <CheckCircle2 className="size-3" />
+                  <p className="text-sm font-medium text-success text-center flex items-center justify-center gap-1">
+                    <CheckCircle2 className="size-4" />
                     Documento baixado
                   </p>
                 )}

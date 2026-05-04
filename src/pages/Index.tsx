@@ -125,20 +125,20 @@ export default function Index() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 slide-in-from-bottom-4">
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-2xl border border-primary/20 bg-card p-8 md:p-12 shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent pointer-events-none" />
+      <section className="relative overflow-hidden rounded-xl border border-border bg-card p-8 md:p-12 shadow-sm">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 max-w-2xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-            <Sparkles className="size-4" />
+            <Sparkles className="size-5" />
             <span>Conteúdo Exclusivo</span>
           </div>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-primary">
             Bem-vindo ao seu <br />
-            <span className="text-gradient-gold">Dashboard de Elite</span>
+            <span className="text-foreground">Dashboard de Elite</span>
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base text-foreground font-normal">
             Acesse as ferramentas práticas e materiais complementares da mentoria. Estes 3 bônus
             foram desenhados para proteger seu negócio, garantir sua margem de lucro e aumentar seu
             faturamento imediato.
@@ -151,35 +151,35 @@ export default function Index() {
         {modules.map((mod) => (
           <Card
             key={mod.href}
-            className="group relative overflow-hidden border-border/50 bg-slate-50 transition-all duration-300 hover:scale-105 hover:shadow-lg flex flex-col"
+            className="group relative overflow-hidden transition-all duration-200 hover:scale-105 hover:shadow-md flex flex-col"
           >
-            <CardHeader className="flex-1">
+            <CardHeader className="flex-1 pb-6">
               <div className="flex justify-between items-start mb-4">
-                <mod.icon className={`size-10 ${mod.color}`} />
+                <mod.icon className="size-10 text-primary" />
                 {mod.acessado ? (
                   <Badge
                     variant="outline"
-                    className="bg-primary/5 text-primary border-primary/20 gap-1.5"
+                    className="bg-success/10 text-success border-success/20 gap-1.5"
                   >
-                    <CheckCircle2 className="size-3.5" />
+                    <CheckCircle2 className="size-4" />
                     {mod.progressoText || 'Acessado'}
                   </Badge>
                 ) : (
-                  <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-amber-500/20">
+                  <Badge className="bg-secondary/10 text-secondary hover:bg-secondary/20 border-secondary/20">
                     Novo
                   </Badge>
                 )}
               </div>
-              <CardTitle className="font-heading text-xl text-slate-900">{mod.title}</CardTitle>
-              <CardDescription className="text-sm leading-relaxed mt-2 text-slate-700 font-medium">
+              <CardTitle className="text-xl font-bold text-primary">{mod.title}</CardTitle>
+              <CardDescription className="text-base font-normal text-foreground mt-2">
                 {mod.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0 mt-auto">
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 text-white group/btn">
+              <Button asChild className="w-full">
                 <Link to={mod.href}>
                   Acessar
-                  <ArrowRight className="ml-2 size-4 transition-transform group-hover/btn:translate-x-1" />
+                  <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
             </CardContent>
@@ -188,11 +188,9 @@ export default function Index() {
       </section>
 
       {/* Quick Tips */}
-      <section className="rounded-xl border border-border/50 bg-secondary/30 p-6">
-        <h3 className="font-heading text-lg font-semibold mb-4 text-primary">
-          Dicas de Ouro para o Sucesso
-        </h3>
-        <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
+      <section className="rounded-xl border border-border bg-muted p-6">
+        <h3 className="text-xl font-bold mb-4 text-primary">Dicas de Ouro para o Sucesso</h3>
+        <ul className="space-y-2 text-base text-foreground font-normal list-disc list-inside">
           <li>Sempre adapte os scripts de vendas para o seu tom de voz e da sua marca.</li>
           <li>Revise seu custo por minuto a cada 3 meses para não perder margem de lucro.</li>
           <li>Contratos verbais não têm validade jurídica no regime de salão parceiro.</li>

@@ -55,10 +55,12 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-sm shadow-xl animate-fade-in">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold font-heading">Cadastro</CardTitle>
-          <CardDescription>Crie sua conta para acessar os bônus exclusivos.</CardDescription>
+      <Card className="w-full max-w-sm animate-fade-in">
+        <CardHeader className="space-y-2 pb-6">
+          <CardTitle className="text-2xl font-bold text-primary">Cadastro</CardTitle>
+          <CardDescription className="text-base font-normal text-foreground">
+            Crie sua conta para acessar os bônus exclusivos.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,6 +72,7 @@ export default function Register() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                aria-label="Nome"
               />
             </div>
             <div className="space-y-2">
@@ -80,6 +83,7 @@ export default function Register() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                aria-label="Email"
               />
             </div>
             <div className="space-y-2">
@@ -91,6 +95,7 @@ export default function Register() {
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                aria-label="Senha"
               />
             </div>
             <div className="space-y-2">
@@ -102,6 +107,7 @@ export default function Register() {
                 minLength={6}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                aria-label="Confirmar Senha"
               />
             </div>
 

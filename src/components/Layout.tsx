@@ -55,14 +55,12 @@ export default function Layout() {
     <SidebarProvider>
       <Sidebar variant="inset" className="border-r-border/50">
         <SidebarHeader className="p-4 flex flex-row items-center gap-3">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Crown className="size-5" />
+          <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <Crown className="size-6" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none">
-            <span className="font-heading font-bold text-lg text-primary text-gradient-gold">
-              Mentoria
-            </span>
-            <span className="text-xs text-muted-foreground font-medium">High-Ticket Beauty</span>
+            <span className="text-xl font-bold text-primary">DTS Mentoria</span>
+            <span className="text-sm font-medium text-muted-foreground">High-Ticket Beauty</span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -91,48 +89,38 @@ export default function Layout() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset className="bg-background">
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/50 px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger className="-ml-1" />
-            <div className="w-px h-4 bg-border mx-2" />
-            <div className="flex items-center gap-2">
-              <Crown className="size-5 text-primary hidden sm:block" />
-              <h1 className="font-heading text-lg text-foreground/90 font-semibold truncate max-w-[150px] sm:max-w-none">
-                Mentoria Beleza High-Ticket
-              </h1>
-            </div>
+      <SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-white px-4 md:px-8 shadow-sm z-10 relative">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="-ml-1" aria-label="Abrir Menu" />
+            <Link to="/dashboard" className="flex items-center gap-2">
+              <Crown className="size-6 text-primary" />
+              <h1 className="text-xl font-bold text-primary hidden sm:block">DTS Mentoria</h1>
+            </Link>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-medium hidden sm:inline-block">
+          <div className="flex items-center gap-4">
+            <span className="text-base font-normal text-foreground hidden sm:inline-block">
               {user.name || user.email}
             </span>
-            <Avatar className="size-8 border border-primary/20">
-              <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={signOut}
-              className="text-muted-foreground hover:text-foreground hover:bg-secondary flex items-center gap-2"
+              className="text-foreground hover:text-primary transition-colors duration-200"
+              aria-label="Sair"
             >
-              <span className="hidden sm:inline-block">Sair</span>
-              <LogOut className="size-4" />
+              <LogOut className="size-5 mr-2 hidden sm:inline-block" />
+              Sair
             </Button>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-8 animate-fade-in flex flex-col">
-          <div className="flex-1">
+        <main className="flex-1 overflow-auto bg-background animate-fade-in flex flex-col">
+          <div className="px-4 md:px-8 py-8 flex-1">
             <Outlet />
           </div>
-          <footer className="mt-12 pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>
-              &copy; {new Date().getFullYear()} Mentoria High-Ticket. Todos os direitos reservados.
+          <footer className="p-4 border-t border-border bg-white mt-auto">
+            <p className="text-center text-muted-foreground text-sm font-medium">
+              &copy; {new Date().getFullYear()} DTS Mentoria
             </p>
-            <a href="#" className="hover:text-primary transition-colors font-medium">
-              Suporte
-            </a>
           </footer>
         </main>
       </SidebarInset>

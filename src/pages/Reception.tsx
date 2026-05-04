@@ -195,27 +195,23 @@ export default function Reception() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
-      <header className="border-b bg-card">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild className="shrink-0">
-            <Link to="/dashboard">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Voltar</span>
-            </Link>
+      <main className="max-w-4xl mx-auto py-4 animate-fade-in">
+        <div className="mb-6 flex flex-col gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => window.history.back()}
+            className="w-fit -ml-4"
+            aria-label="Voltar"
+          >
+            <ArrowLeft className="size-5 mr-2" /> Voltar
           </Button>
-          <h1 className="font-heading text-xl font-bold">Recepção que Vende</h1>
+          <h1 className="text-2xl font-bold text-primary">Recepção que Vende</h1>
         </div>
-      </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 animate-fade-in-up">
         <Tabs defaultValue={TABS[0].id} className="w-full">
-          <TabsList className="w-full flex flex-wrap h-auto justify-start mb-6 rounded-lg bg-muted/50 p-1">
+          <TabsList className="flex flex-wrap mb-6">
             {TABS.map((tab) => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex-1 min-w-[120px] data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
+              <TabsTrigger key={tab.id} value={tab.id} className="flex-1 min-w-[120px]">
                 {tab.label}
               </TabsTrigger>
             ))}
@@ -223,16 +219,16 @@ export default function Reception() {
 
           {TABS.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="mt-0 outline-none">
-              <Card className="border-border/50 shadow-sm">
-                <CardHeader className="bg-muted/30 border-b pb-6">
-                  <CardTitle className="text-2xl font-bold text-primary">{tab.title}</CardTitle>
-                  <CardDescription className="text-base text-foreground/70 mt-2">
+              <Card>
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-xl font-bold text-primary">{tab.title}</CardTitle>
+                  <CardDescription className="text-base font-normal text-foreground mt-2">
                     {tab.description}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-6">
-                  <div className="bg-slate-50 dark:bg-slate-900/50 rounded-lg p-6 mb-6 border shadow-inner">
-                    <pre className="whitespace-pre-wrap font-sans text-sm md:text-base leading-relaxed text-foreground/90">
+                <CardContent>
+                  <div className="bg-muted rounded-xl p-6 mb-6 border border-border">
+                    <pre className="whitespace-pre-wrap font-sans text-base font-normal leading-relaxed text-foreground">
                       {tab.content}
                     </pre>
                   </div>
@@ -241,18 +237,18 @@ export default function Reception() {
                     <Button
                       onClick={() => handleCopy(tab.content)}
                       className="flex-1 gap-2"
-                      size="lg"
+                      aria-label="Copiar Script"
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="size-5" />
                       Copiar Script
                     </Button>
                     <Button
                       onClick={() => handleDownloadPDF(tab.title, tab.content)}
                       variant="outline"
-                      className="flex-1 gap-2 border-primary text-primary hover:text-primary-foreground hover:bg-primary"
-                      size="lg"
+                      className="flex-1 gap-2 text-primary"
+                      aria-label="Baixar em PDF"
                     >
-                      <Download className="h-4 w-4" />
+                      <Download className="size-5" />
                       Baixar em PDF
                     </Button>
                   </div>

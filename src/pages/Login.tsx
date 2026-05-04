@@ -53,10 +53,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-sm shadow-xl animate-fade-in-up">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold font-heading">Login</CardTitle>
-          <CardDescription>Entre na sua conta para acessar os bônus.</CardDescription>
+      <Card className="w-full max-w-sm animate-fade-in">
+        <CardHeader className="space-y-2 pb-6">
+          <CardTitle className="text-2xl font-bold text-primary">Login</CardTitle>
+          <CardDescription className="text-base font-normal text-foreground">
+            Entre na sua conta para acessar os bônus.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,6 +70,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                aria-label="Email"
               />
             </div>
             <div className="space-y-2">
@@ -80,6 +83,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pr-10"
+                  aria-label="Senha"
                 />
                 <button
                   type="button"

@@ -208,27 +208,30 @@ export default function Calculator() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto animate-fade-in-up">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Button variant="ghost" onClick={() => navigate('/dashboard')} className="-ml-4 mb-2">
-            <ArrowLeft className="size-4 mr-2" /> Voltar
-          </Button>
-          <h1 className="font-heading text-3xl font-bold tracking-tight">
-            Calculadora de Lucro Real
-          </h1>
-        </div>
+    <div className="max-w-6xl mx-auto animate-fade-in">
+      <div className="mb-6 flex flex-col gap-2">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/dashboard')}
+          className="w-fit -ml-4"
+          aria-label="Voltar para Dashboard"
+        >
+          <ArrowLeft className="size-5 mr-2" /> Voltar
+        </Button>
+        <h1 className="text-2xl font-bold text-primary">Calculadora de Lucro Real</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-6">
-          <Card className="border-border/50 bg-card/50">
-            <CardHeader>
-              <CardTitle className="text-xl">Dados do Serviço</CardTitle>
-              <CardDescription>
+          <Card>
+            <CardHeader className="pb-6">
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Dados do Serviço
+              </CardTitle>
+              <CardDescription className="text-base font-normal text-foreground">
                 A fórmula calcula o lucro líquido por serviço:
                 <br />
-                <span className="font-mono text-xs mt-2 block bg-secondary/50 p-2 rounded">
+                <span className="font-mono text-sm mt-2 block bg-muted p-2 rounded">
                   Lucro Líquido = Preço de Venda - (Custo Insumos + Impostos + Comissão + Custo
                   Operacional por Minuto)
                 </span>
@@ -237,39 +240,49 @@ export default function Calculator() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label>Nome do Serviço</Label>
+                  <Label htmlFor="servico">Nome do Serviço</Label>
                   <Input
+                    id="servico"
                     value={form.servico}
                     onChange={(e) => setForm({ ...form, servico: e.target.value })}
                     placeholder="Ex: Escova Progressiva"
+                    aria-label="Nome do Serviço"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Preço de Venda (R$)</Label>
+                  <Label htmlFor="preco">Preço de Venda (R$)</Label>
                   <Input
+                    id="preco"
                     type="number"
                     value={form.preco_venda}
                     onChange={(e) => setForm({ ...form, preco_venda: e.target.value })}
                     placeholder="ex: 150"
+                    aria-label="Preço de Venda"
                   />
-                  <p className="text-xs text-muted-foreground">Quanto você cobra pelo serviço</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Quanto você cobra pelo serviço
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Custo de Insumos (R$)</Label>
+                  <Label htmlFor="insumos">Custo de Insumos (R$)</Label>
                   <Input
+                    id="insumos"
                     type="number"
                     value={form.custo_insumos}
                     onChange={(e) => setForm({ ...form, custo_insumos: e.target.value })}
                     placeholder="ex: 20"
+                    aria-label="Custo de Insumos"
                   />
-                  <p className="text-xs text-muted-foreground">Produtos usados no serviço</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Produtos usados no serviço
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
+                  <Label htmlFor="impostos" className="flex items-center gap-2">
                     Impostos (R$)
                     <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="size-4 text-muted-foreground cursor-help" />
+                      <TooltipTrigger asChild>
+                        <Info className="size-5 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Consulte seu contador para valor exato</p>
@@ -277,99 +290,121 @@ export default function Calculator() {
                     </Tooltip>
                   </Label>
                   <Input
+                    id="impostos"
                     type="number"
                     value={form.impostos}
                     onChange={(e) => setForm({ ...form, impostos: e.target.value })}
                     placeholder="ex: 22.5"
+                    aria-label="Impostos"
                   />
-                  <p className="text-xs text-muted-foreground">ISS, PIS, COFINS (~15%)</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    ISS, PIS, COFINS (~15%)
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Comissão (%)</Label>
+                  <Label htmlFor="comissao">Comissão (%)</Label>
                   <Input
+                    id="comissao"
                     type="number"
                     value={form.comissao}
                     onChange={(e) => setForm({ ...form, comissao: e.target.value })}
                     placeholder="ex: 50"
+                    aria-label="Comissão"
                   />
-                  <p className="text-xs text-muted-foreground">Percentual pago ao profissional</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Percentual pago ao profissional
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Duração do Serviço (min)</Label>
+                  <Label htmlFor="tempo">Duração do Serviço (min)</Label>
                   <Input
+                    id="tempo"
                     type="number"
                     value={form.tempo}
                     onChange={(e) => setForm({ ...form, tempo: e.target.value })}
                     placeholder="ex: 60"
+                    aria-label="Duração do Serviço"
                   />
-                  <p className="text-xs text-muted-foreground">Quantos minutos leva o serviço</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Quantos minutos leva o serviço
+                  </p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Custo Fixo Mensal (R$)</Label>
+                  <Label htmlFor="custofixo">Custo Fixo Mensal (R$)</Label>
                   <Input
+                    id="custofixo"
                     type="number"
                     value={form.custo_fixo_mensal}
                     onChange={(e) => setForm({ ...form, custo_fixo_mensal: e.target.value })}
                     placeholder="ex: 5000"
+                    aria-label="Custo Fixo Mensal"
                   />
-                  <p className="text-xs text-muted-foreground">Aluguel, água, luz, etc.</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Aluguel, água, luz, etc.
+                  </p>
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label>Minutos Disponíveis no Mês</Label>
+                  <Label htmlFor="minutos">Minutos Disponíveis no Mês</Label>
                   <Input
+                    id="minutos"
                     type="number"
                     value={form.minutos_disponiveis}
                     onChange={(e) => setForm({ ...form, minutos_disponiveis: e.target.value })}
                     placeholder="ex: 10560"
+                    aria-label="Minutos Disponíveis"
                   />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Calculadora: 8 horas x 22 dias úteis x 60 minutos = 10.560
                   </p>
                 </div>
               </div>
 
-              <div className="bg-secondary/30 rounded-lg p-4 border border-border mt-4">
-                <p className="text-sm font-medium mb-2">Cálculo do Custo por Minuto</p>
-                <p className="text-sm text-muted-foreground font-mono">
+              <div className="bg-muted rounded-xl p-6 border border-border mt-4">
+                <p className="text-base font-semibold mb-2 text-foreground">
+                  Cálculo do Custo por Minuto
+                </p>
+                <p className="text-sm font-normal text-muted-foreground font-mono">
                   Custo por Minuto = Custo Fixo Mensal ÷ Minutos Disponíveis
                 </p>
-                <div className="mt-2 text-primary font-semibold">
+                <div className="mt-2 text-primary font-bold text-lg">
                   {formatCurrency(cFixo)} ÷ {minDisp || 1} = {formatCurrency(custoPorMinuto)} por
                   minuto
                 </div>
               </div>
 
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 space-y-4">
-                <h3 className="text-xl font-heading font-bold">Resultado Final</h3>
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-6 space-y-4">
+                <h3 className="text-2xl font-bold text-primary">Resultado Final</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Lucro Líquido por Serviço</p>
-                    <p className="text-2xl font-bold text-emerald-600">
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Lucro Líquido por Serviço
+                    </p>
+                    <p className="text-2xl font-bold text-success">
                       {formatCurrency(lucroLiquido)}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">Margem de Lucro</p>
+                    <p className="text-sm font-medium text-muted-foreground">Margem de Lucro</p>
                     <p
-                      className={`text-2xl font-bold ${margemLucro < 20 ? 'text-destructive' : 'text-emerald-600'}`}
+                      className={`text-2xl font-bold ${margemLucro < 20 ? 'text-destructive' : 'text-success'}`}
                     >
                       {margemLucro.toFixed(2).replace('.', ',')}%
                     </p>
                   </div>
                 </div>
                 {margemLucro < 20 && pVenda > 0 && (
-                  <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg flex items-center gap-2">
-                    <AlertTriangle className="size-4 shrink-0" /> Se lucro &lt; 20%, revise preço ou
+                  <div className="bg-destructive/10 text-destructive text-sm font-medium p-4 rounded-lg flex items-center gap-2">
+                    <AlertTriangle className="size-5 shrink-0" /> Se lucro &lt; 20%, revise preço ou
                     custos
                   </div>
                 )}
               </div>
 
-              <Button onClick={handleSave} disabled={isSaving} size="lg" className="w-full">
+              <Button onClick={handleSave} disabled={isSaving} className="w-full">
                 {isSaving ? (
-                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  <Loader2 className="size-5 mr-2 animate-spin" />
                 ) : (
-                  <Save className="size-4 mr-2" />
+                  <Save className="size-5 mr-2" />
                 )}{' '}
                 Salvar Cálculo
               </Button>
@@ -378,9 +413,11 @@ export default function Calculator() {
         </div>
 
         <div className="space-y-6">
-          <Card className="border-border/50 bg-card/50 overflow-hidden h-[400px]">
+          <Card className="overflow-hidden h-[400px]">
             <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Comparativo na Planilha</CardTitle>
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Comparativo na Planilha
+              </CardTitle>
             </CardHeader>
             <CardContent className="p-0 h-[calc(100%-70px)]">
               <iframe
@@ -391,16 +428,18 @@ export default function Calculator() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/50 bg-card/50">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-lg">Últimos Cálculos</CardTitle>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-6">
+              <CardTitle className="text-lg font-semibold text-foreground">
+                Últimos Cálculos
+              </CardTitle>
               <Button
                 variant="outline"
-                size="sm"
                 onClick={exportToCSV}
                 disabled={history.length === 0}
+                aria-label="Exportar para Excel"
               >
-                <Download className="size-4 mr-2" /> Exportar para Excel
+                <Download className="size-5 mr-2" /> Exportar para Excel
               </Button>
             </CardHeader>
             <CardContent>
