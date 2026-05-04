@@ -24,14 +24,15 @@ export const getDadosCalculadora = async (userId: string) => {
   })
 }
 
-export const getHistoryCalculadora = async (userId: string) => {
-  return pb
-    .collection('dados_calculadora')
-    .getList<DadosCalculadora>(1, 5, {
-      filter: `user="${userId}"`,
-      sort: '-created',
-    })
-    .then((res) => res.items)
+export const getHistoryCalculadora = async (
+  userId: string,
+  page: number = 1,
+  perPage: number = 20,
+) => {
+  return pb.collection('dados_calculadora').getList<DadosCalculadora>(page, perPage, {
+    filter: `user="${userId}"`,
+    sort: '-created',
+  })
 }
 
 export const createDadosCalculadora = async (data: Omit<DadosCalculadora, 'id'>) => {

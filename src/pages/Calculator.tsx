@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -75,6 +75,9 @@ export default function Calculator() {
   const [history, setHistory] = useState<DadosCalculadora[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const observerTarget = useRef<HTMLDivElement>(null)
 
   const [localForm, setLocalForm] = useState({
     servico: '',
@@ -96,18 +99,26 @@ export default function Calculator() {
     return () => clearTimeout(timer)
   }, [localForm])
 
-  const loadHistory = useCallback(async () => {
-    if (!user) return
-    try {
-      setIsLoadingHistory(true)
-      const data = await getHistoryCalculadora(user.id)
-      setHistory(data)
-    } catch (err) {
-      toast.error('Erro ao carregar histórico')
-    } finally {
-      setIsLoadingHistory(false)
-    }
-  }, [user])
+  const loadHistory = useCallback(
+    async (pageToLoad: number, append = false) => {
+      if (!user) return
+      try {
+        setIsLoadingHistory(pageToLoad === 1)
+        const data = await getHistoryCalculadora(user.id, pageToLoad, 20)
+        if (append) {
+          setHistory((prev) => [...prev, ...data.items])
+        } else {
+          setHistory(data.items)
+        }
+        setHasMore(data.page < data.totalPages)
+      } catch (err) {
+        toast.error('Erro ao carregar histórico')
+      } finally {
+        setIsLoadingHistory(false)
+      }
+    },
+    [user],
+  )
 
   useEffect(() => {
     try {
@@ -115,8 +126,31 @@ export default function Calculator() {
     } catch {
       /* intentionally ignored */
     }
-    loadHistory()
+    loadHistory(1, false)
   }, [loadHistory])
+
+  useEffect(() => {
+    if (page > 1) {
+      loadHistory(page, true)
+    }
+  }, [page, loadHistory])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingHistory) {
+          setPage((p) => p + 1)
+        }
+      },
+      { threshold: 1.0 },
+    )
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current)
+    }
+
+    return () => observer.disconnect()
+  }, [hasMore, isLoadingHistory])
 
   const pVenda = Number(form.preco_venda) || 0
   const cInsumos = Number(form.custo_insumos) || 0
@@ -170,7 +204,8 @@ export default function Calculator() {
         user: user!.id,
       })
       toast.success('Cálculo salvo com sucesso!')
-      loadHistory()
+      setPage(1)
+      loadHistory(1, false)
     } catch (e) {
       toast.error('Erro ao salvar cálculo')
     } finally {
@@ -442,6 +477,7 @@ export default function Calculator() {
             </CardHeader>
             <CardContent className="p-0 h-[calc(100%-70px)]">
               <iframe
+                loading="lazy"
                 srcDoc={iframeContent}
                 className="w-full h-full border-0"
                 title="Google Sheets Mock"
@@ -467,17 +503,17 @@ export default function Calculator() {
               </Button>
             </CardHeader>
             <CardContent>
-              {isLoadingHistory ? (
+              {isLoadingHistory && page === 1 ? (
                 <Skeleton className="h-32 w-full" />
               ) : history.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   Nenhum cálculo salvo ainda.
                 </p>
               ) : (
-                <>
-                  <div className="hidden sm:block border rounded-md overflow-auto">
+                <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+                  <div className="hidden sm:block border rounded-md">
                     <Table>
-                      <TableHeader className="bg-secondary/50">
+                      <TableHeader className="bg-secondary/50 sticky top-0 z-10 shadow-sm">
                         <TableRow>
                           <TableHead>Serviço</TableHead>
                           <TableHead>Preço</TableHead>
@@ -528,7 +564,15 @@ export default function Calculator() {
                       </div>
                     ))}
                   </div>
-                </>
+                  {hasMore && (
+                    <div
+                      ref={observerTarget}
+                      className="p-4 text-center text-sm text-muted-foreground flex items-center justify-center"
+                    >
+                      <Loader2 className="size-4 animate-spin mr-2" /> Carregando mais...
+                    </div>
+                  )}
+                </div>
               )}
             </CardContent>
           </Card>
