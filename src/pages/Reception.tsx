@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect } from 'react'
+import { trackAccess } from '@/services/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
@@ -46,6 +48,10 @@ Tenho um horário especial e exclusivo para você na [Dia da Semana] às [Horár
 
 export default function Reception() {
   const { toast } = useToast()
+
+  useEffect(() => {
+    trackAccess('recepcao')
+  }, [])
 
   const copyWhatsApp = () => {
     navigator.clipboard.writeText(whatsappTemplate)

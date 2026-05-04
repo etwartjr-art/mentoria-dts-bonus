@@ -1,4 +1,5 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
+import { Link, Outlet, useLocation, Navigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/use-auth'
 import {
   Sidebar,
   SidebarContent,
@@ -13,8 +14,10 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar'
-import { Crown, ClipboardList, BarChart, Clapperboard, LayoutDashboard } from 'lucide-react'
+import { Crown, ClipboardList, BarChart, Clapperboard, LayoutDashboard, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -25,6 +28,28 @@ const navigation = [
 
 export default function Layout() {
   const location = useLocation()
+  const { user, loading, signOut } = useAuth()
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Skeleton className="h-12 w-12 rounded-full" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  const initials = user.name
+    ? user.name
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'U'
 
   return (
     <SidebarProvider>
@@ -79,14 +104,22 @@ export default function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium hidden sm:inline-block">Maria Silva</span>
-            <Avatar className="size-8">
-              <AvatarImage
-                src="https://img.usecurling.com/ppl/thumbnail?gender=female&seed=1"
-                alt="Student"
-              />
-              <AvatarFallback>MS</AvatarFallback>
+            <span className="text-sm font-medium hidden sm:inline-block">
+              {user.name || user.email}
+            </span>
+            <Avatar className="size-8 border border-primary/20">
+              <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                {initials}
+              </AvatarFallback>
             </Avatar>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={signOut}
+              className="text-muted-foreground hover:text-foreground hover:bg-secondary"
+            >
+              <LogOut className="size-4" />
+            </Button>
           </div>
         </header>
         <main className="flex-1 overflow-auto p-4 md:p-8 animate-fade-in flex flex-col">

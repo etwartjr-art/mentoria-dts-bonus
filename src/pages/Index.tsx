@@ -3,7 +3,16 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ClipboardList, BarChart, Clapperboard, ArrowRight, Sparkles } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import {
+  ClipboardList,
+  BarChart,
+  Clapperboard,
+  ArrowRight,
+  Sparkles,
+  CheckCircle2,
+} from 'lucide-react'
+import pb from '@/lib/pocketbase/client'
 
 type Status = 'loading' | 'success' | 'empty' | 'error'
 
@@ -15,8 +24,27 @@ export default function Index() {
     const fetchModules = async () => {
       try {
         setStatus('loading')
-        // Simulate an artificial delay to showcase the loading state
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        let userAcessos: string[] = []
+        let progresso: any = null
+        if (pb.authStore.record) {
+          try {
+            const acessos = await pb
+              .collection('bonus_acesso')
+              .getFullList({ filter: `user="${pb.authStore.record.id}"` })
+            userAcessos = acessos.map((a) => a.tipo_bonus)
+          } catch {
+            /* intentionally ignored */
+          }
+          try {
+            progresso = await pb
+              .collection('progresso_juridico')
+              .getFirstListItem(`user="${pb.authStore.record.id}"`)
+          } catch {
+            /* intentionally ignored */
+          }
+        }
+
+        const checkAcessado = (id: string) => userAcessos.includes(id)
 
         const data = [
           {
@@ -25,6 +53,10 @@ export default function Index() {
             icon: ClipboardList,
             href: '/juridico',
             color: 'text-blue-500',
+            acessado: checkAcessado('juridico'),
+            progressoText: progresso
+              ? `${[progresso.checklist_completo, progresso.nda_baixado].filter(Boolean).length}/2 Concluído`
+              : null,
           },
           {
             title: 'Calculadora de Lucro Real',
@@ -32,6 +64,8 @@ export default function Index() {
             icon: BarChart,
             href: '/calculadora',
             color: 'text-emerald-500',
+            acessado: checkAcessado('calculadora'),
+            progressoText: checkAcessado('calculadora') ? 'Acessado' : 'Novo',
           },
           {
             title: 'Recepção que Vende',
@@ -39,6 +73,8 @@ export default function Index() {
             icon: Clapperboard,
             href: '/recepcao',
             color: 'text-purple-500',
+            acessado: checkAcessado('recepcao'),
+            progressoText: checkAcessado('recepcao') ? 'Acessado' : 'Novo',
           },
         ]
 
@@ -122,7 +158,22 @@ export default function Index() {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
             <CardHeader className="flex-1">
-              <mod.icon className={`size-10 mb-4 ${mod.color}`} />
+              <div className="flex justify-between items-start mb-4">
+                <mod.icon className={`size-10 ${mod.color}`} />
+                {mod.acessado ? (
+                  <Badge
+                    variant="outline"
+                    className="bg-primary/5 text-primary border-primary/20 gap-1.5"
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    {mod.progressoText || 'Acessado'}
+                  </Badge>
+                ) : (
+                  <Badge className="bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 border-amber-500/20">
+                    Novo
+                  </Badge>
+                )}
+              </div>
               <CardTitle className="font-heading text-xl">{mod.title}</CardTitle>
               <CardDescription className="text-sm leading-relaxed mt-2">
                 {mod.description}

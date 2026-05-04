@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { trackAccess, getProgress, updateProgress } from '@/services/progress'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -31,8 +32,23 @@ export default function LegalKit() {
   const { toast } = useToast()
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({})
 
+  useEffect(() => {
+    trackAccess('juridico')
+    getProgress().then((p) => {
+      if (p) {
+        if (p.checklist_completo) {
+          const all = checklist.reduce((acc, _, i) => ({ ...acc, [i]: true }), {})
+          setCheckedItems(all)
+        }
+      }
+    })
+  }, [])
+
   const toggleCheck = (index: number) => {
-    setCheckedItems((prev) => ({ ...prev, [index]: !prev[index] }))
+    const newItems = { ...checkedItems, [index]: !checkedItems[index] }
+    setCheckedItems(newItems)
+    const isAllChecked = checklist.every((_, i) => newItems[i])
+    updateProgress({ checklist_completo: isAllChecked })
   }
 
   const copyNDA = () => {
@@ -41,6 +57,7 @@ export default function LegalKit() {
       title: 'Copiado com sucesso!',
       description: 'O texto do NDA foi copiado para a área de transferência.',
     })
+    updateProgress({ nda_baixado: true })
   }
 
   return (

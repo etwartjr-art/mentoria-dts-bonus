@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useEffect } from 'react'
+import { trackAccess } from '@/services/progress'
 import {
   Table,
   TableBody,
@@ -10,6 +12,10 @@ import {
 import { Calculator as CalcIcon, DollarSign, Clock, LayoutGrid } from 'lucide-react'
 
 export default function Calculator() {
+  useEffect(() => {
+    trackAccess('calculadora')
+  }, [])
+
   return (
     <div
       className="max-w-4xl mx-auto space-y-8 animate-slide-up opacity-0"
