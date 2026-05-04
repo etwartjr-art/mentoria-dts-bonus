@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -11,56 +11,99 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ExternalLink, Printer } from 'lucide-react'
+import { ExternalLink, Printer, Plus, Trash2, Save, Loader2 } from 'lucide-react'
 import { trackAccess } from '@/services/progress'
+import { useAuth } from '@/hooks/use-auth'
+import {
+  getDadosCalculadora,
+  createDadosCalculadora,
+  updateDadosCalculadora,
+  deleteDadosCalculadora,
+  DadosCalculadora,
+} from '@/services/dados_calculadora'
+import { toast } from 'sonner'
+import pb from '@/lib/pocketbase/client'
 
 type ServiceData = {
   id: string
   servico: string
-  preco: number
-  insumos: number
+  preco_venda: number
+  custo_insumos: number
   impostos: number
   comissao: number
   tempo: number
-  custoMinuto: number
+  custo_operacional_minuto: number
+  lucro_liquido?: number
+  isNew?: boolean
 }
 
-const initialData: ServiceData[] = [
+const initialData: Omit<ServiceData, 'id'>[] = [
   {
-    id: '1',
     servico: 'Escova Progressiva',
-    preco: 150,
-    insumos: 25,
+    preco_venda: 150,
+    custo_insumos: 25,
     impostos: 15,
     comissao: 10,
     tempo: 60,
-    custoMinuto: 0.25,
+    custo_operacional_minuto: 0.25,
   },
   {
-    id: '2',
     servico: 'Hidratação',
-    preco: 120,
-    insumos: 18,
+    preco_venda: 120,
+    custo_insumos: 18,
     impostos: 15,
     comissao: 10,
     tempo: 45,
-    custoMinuto: 0.25,
+    custo_operacional_minuto: 0.25,
   },
   {
-    id: '3',
     servico: 'Coloração',
-    preco: 200,
-    insumos: 40,
+    preco_venda: 200,
+    custo_insumos: 40,
     impostos: 15,
     comissao: 10,
     tempo: 90,
-    custoMinuto: 0.25,
+    custo_operacional_minuto: 0.25,
   },
 ]
 
 export default function Calculator() {
+  const { user } = useAuth()
   const [status, setStatus] = useState<'loading' | 'error' | 'success' | 'empty'>('loading')
   const [data, setData] = useState<ServiceData[]>([])
+  const [isSaving, setIsSaving] = useState(false)
+
+  const loadData = useCallback(async () => {
+    if (!user) return
+    try {
+      setStatus('loading')
+      const records = await getDadosCalculadora(user.id)
+
+      if (records.length === 0) {
+        // Seed default rows for the new user
+        const seededData = await Promise.all(
+          initialData.map((item) =>
+            createDadosCalculadora({
+              ...item,
+              lucro_liquido:
+                item.preco_venda -
+                (item.custo_insumos +
+                  item.preco_venda * (item.impostos / 100) +
+                  item.preco_venda * (item.comissao / 100) +
+                  item.tempo * item.custo_operacional_minuto),
+              user: user.id,
+            }),
+          ),
+        )
+        setData(seededData.map((d) => ({ ...d })))
+      } else {
+        setData(records.map((r) => ({ ...r })))
+      }
+      setStatus('success')
+    } catch (err) {
+      setStatus('error')
+    }
+  }, [user])
 
   useEffect(() => {
     try {
@@ -68,29 +111,88 @@ export default function Calculator() {
     } catch {
       // intentionally ignored
     }
-
-    // Simulate loading the spreadsheet embed
-    const timer = setTimeout(() => {
-      setData(initialData)
-      setStatus('success')
-    }, 1500)
-
-    return () => clearTimeout(timer)
-  }, [])
+    loadData()
+  }, [loadData])
 
   const calculateProfit = (row: ServiceData) => {
-    const B = row.preco
-    const C = row.insumos
-    const D = row.impostos / 100
-    const E = row.comissao / 100
-    const F = row.tempo
-    const G = row.custoMinuto
+    const B = row.preco_venda || 0
+    const C = row.custo_insumos || 0
+    const D = (row.impostos || 0) / 100
+    const E = (row.comissao || 0) / 100
+    const F = row.tempo || 0
+    const G = row.custo_operacional_minuto || 0
     return B - (C + B * D + B * E + F * G)
   }
 
   const updateRow = (index: number, field: keyof ServiceData, value: string | number) => {
     const newData = [...data]
-    setData(newData.map((row, i) => (i === index ? { ...row, [field]: value } : row)))
+    newData[index] = { ...newData[index], [field]: value }
+    setData(newData)
+  }
+
+  const handleSave = async () => {
+    if (!user) return
+    setIsSaving(true)
+    try {
+      for (const row of data) {
+        const lucro = calculateProfit(row)
+        const rowData = {
+          servico: row.servico,
+          preco_venda: row.preco_venda,
+          custo_insumos: row.custo_insumos,
+          impostos: row.impostos,
+          comissao: row.comissao,
+          tempo: row.tempo,
+          custo_operacional_minuto: row.custo_operacional_minuto,
+          lucro_liquido: lucro,
+          user: user.id,
+        }
+
+        if (row.isNew) {
+          await createDadosCalculadora(rowData)
+        } else {
+          await updateDadosCalculadora(row.id, rowData)
+        }
+      }
+      toast.success('Alterações salvas com sucesso!')
+      await loadData()
+    } catch (error) {
+      toast.error('Erro ao salvar as alterações.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const addNewRow = () => {
+    setData([
+      ...data,
+      {
+        id: `temp-${Date.now()}`,
+        servico: 'Novo Serviço',
+        preco_venda: 0,
+        custo_insumos: 0,
+        impostos: 0,
+        comissao: 0,
+        tempo: 0,
+        custo_operacional_minuto: 0,
+        isNew: true,
+      },
+    ])
+  }
+
+  const deleteRow = async (id: string) => {
+    if (id.startsWith('temp-')) {
+      setData(data.filter((r) => r.id !== id))
+      return
+    }
+
+    try {
+      await deleteDadosCalculadora(id)
+      setData(data.filter((r) => r.id !== id))
+      toast.success('Serviço removido.')
+    } catch (err) {
+      toast.error('Erro ao remover o serviço.')
+    }
   }
 
   return (
@@ -188,17 +290,17 @@ export default function Calculator() {
             </CardDescription>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto print:hidden">
-            <Button
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => window.open('https://docs.google.com/spreadsheets', '_blank')}
-            >
-              <ExternalLink className="size-4 mr-2" />
-              Editar Planilha
+            <Button variant="outline" className="w-full sm:w-auto" onClick={addNewRow}>
+              <Plus className="size-4 mr-2" />
+              Novo Serviço
             </Button>
-            <Button className="w-full sm:w-auto" onClick={() => window.print()}>
-              <Printer className="size-4 mr-2" />
-              Baixar Relatório
+            <Button className="w-full sm:w-auto" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <Loader2 className="size-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="size-4 mr-2" />
+              )}
+              Salvar Alterações
             </Button>
           </div>
         </CardHeader>
@@ -227,14 +329,7 @@ export default function Calculator() {
             <div className="p-16 text-center text-muted-foreground">
               <p className="text-lg font-medium">Nenhum serviço cadastrado</p>
               {status === 'empty' && (
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => {
-                    setData(initialData)
-                    setStatus('success')
-                  }}
-                >
+                <Button variant="outline" className="mt-4" onClick={loadData}>
                   Recarregar Tabela
                 </Button>
               )}
@@ -255,9 +350,10 @@ export default function Calculator() {
                     <TableHead className="whitespace-nowrap">
                       G: Custo Operacional por Minuto (R$)
                     </TableHead>
-                    <TableHead className="whitespace-nowrap text-right pr-6">
+                    <TableHead className="whitespace-nowrap text-right">
                       H: Lucro Líquido (R$)
                     </TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -276,16 +372,20 @@ export default function Calculator() {
                         <TableCell>
                           <Input
                             type="number"
-                            value={row.preco === 0 ? '' : row.preco}
-                            onChange={(e) => updateRow(index, 'preco', Number(e.target.value))}
+                            value={row.preco_venda === 0 ? '' : row.preco_venda}
+                            onChange={(e) =>
+                              updateRow(index, 'preco_venda', Number(e.target.value))
+                            }
                             className="min-w-[100px] h-9"
                           />
                         </TableCell>
                         <TableCell>
                           <Input
                             type="number"
-                            value={row.insumos === 0 ? '' : row.insumos}
-                            onChange={(e) => updateRow(index, 'insumos', Number(e.target.value))}
+                            value={row.custo_insumos === 0 ? '' : row.custo_insumos}
+                            onChange={(e) =>
+                              updateRow(index, 'custo_insumos', Number(e.target.value))
+                            }
                             className="min-w-[100px] h-9"
                           />
                         </TableCell>
@@ -317,19 +417,31 @@ export default function Calculator() {
                           <Input
                             type="number"
                             step="0.01"
-                            value={row.custoMinuto === 0 ? '' : row.custoMinuto}
+                            value={
+                              row.custo_operacional_minuto === 0 ? '' : row.custo_operacional_minuto
+                            }
                             onChange={(e) =>
-                              updateRow(index, 'custoMinuto', Number(e.target.value))
+                              updateRow(index, 'custo_operacional_minuto', Number(e.target.value))
                             }
                             className="min-w-[120px] h-9"
                           />
                         </TableCell>
-                        <TableCell className="text-right pr-6">
+                        <TableCell className="text-right">
                           <div
                             className={`font-bold px-3 py-2 rounded-md whitespace-nowrap inline-block border ${isLoss ? 'bg-destructive/10 text-destructive border-destructive/20' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'}`}
                           >
                             R$ {profit.toFixed(2).replace('.', ',')}
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteRow(row.id)}
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
                         </TableCell>
                       </TableRow>
                     )

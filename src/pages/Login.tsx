@@ -25,20 +25,29 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      navigate('/', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setErrorMsg('')
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email.trim())) {
+      setErrorMsg('Email inválido')
+      return
+    }
+
+    setLoading(true)
 
     const { error } = await signIn({ email: email.trim(), password })
 
     if (error) {
       setLoading(false)
-      setErrorMsg('Email ou senha incorretos')
+      setErrorMsg('Credenciais incorretas')
+    } else {
+      navigate('/dashboard')
     }
   }
 
@@ -99,7 +108,7 @@ export default function Login() {
         <CardFooter>
           <p className="text-sm text-muted-foreground text-center w-full">
             Não tem uma conta?{' '}
-            <Link to="/signup" className="text-primary font-medium hover:underline">
+            <Link to="/register" className="text-primary font-medium hover:underline">
               Cadastre-se
             </Link>
           </p>

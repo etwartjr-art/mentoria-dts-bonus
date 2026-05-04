@@ -10,7 +10,7 @@ import Calculator from './pages/Calculator'
 import Reception from './pages/Reception'
 import NotFound from './pages/NotFound'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
+import Register from './pages/Register'
 
 const App = () => (
   <AuthProvider>
@@ -20,7 +20,7 @@ const App = () => (
         <Sonner />
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/register" element={<Register />} />
           <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Index />} />

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T01:59:01.522Z",
+  "generatedAt": "2026-05-04T02:04:04.208Z",
   "collections": [
     {
       "name": "users",
@@ -138,6 +138,89 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_progresso_user ON progresso_juridico (user)"]
+    },
+    {
+      "name": "dados_calculadora",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && user = @request.auth.id",
+        "view": "@request.auth.id != '' && user = @request.auth.id",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != '' && user = @request.auth.id",
+        "delete": "@request.auth.id != '' && user = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "user",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "servico",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "preco_venda",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "custo_insumos",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "impostos",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "comissao",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "tempo",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "custo_operacional_minuto",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "lucro_liquido",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": []
     }
   ]
 }

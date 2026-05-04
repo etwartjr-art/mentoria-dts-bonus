@@ -13,34 +13,43 @@ import {
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
 
-export default function Signup() {
+export default function Register() {
   const { signUp, user } = useAuth()
   const navigate = useNavigate()
-  const { toast } = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    if (user) navigate('/', { replace: true })
+    if (user) navigate('/dashboard', { replace: true })
   }, [user, navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMsg('')
+
+    if (password.length < 6) {
+      setErrorMsg('A senha deve ter no mínimo 6 caracteres')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMsg('Senhas não conferem')
+      return
+    }
+
     setLoading(true)
     const { error } = await signUp({ email, password, name })
     setLoading(false)
+
     if (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Erro de cadastro',
-        description: 'Verifique os dados e tente novamente',
-      })
+      setErrorMsg('Usuário já existe')
     } else {
-      navigate('/')
+      navigate('/dashboard')
     }
   }
 
@@ -54,7 +63,7 @@ export default function Signup() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome Completo</Label>
+              <Label htmlFor="name">Nome</Label>
               <Input
                 id="name"
                 type="text"
@@ -79,14 +88,32 @@ export default function Signup() {
                 id="password"
                 type="password"
                 required
-                minLength={8}
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                required
+                minLength={6}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+
+            {errorMsg && (
+              <p className="text-sm font-medium text-destructive text-center animate-fade-in">
+                {errorMsg}
+              </p>
+            )}
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Criar Conta
+              Cadastrar
             </Button>
           </form>
         </CardContent>
