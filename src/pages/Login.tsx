@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Loader2, Eye, EyeOff } from 'lucide-react'
+import logoImg from '@/assets/logounificadocomtexto-5fbfd.png'
 
 export default function Login() {
   const { signIn, user } = useAuth()
@@ -52,13 +53,26 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-sm animate-fade-in">
-        <CardHeader className="space-y-2 pb-6">
-          <CardTitle className="text-2xl font-bold text-primary">Login</CardTitle>
-          <CardDescription className="text-base font-normal text-foreground">
-            Entre na sua conta para acessar os bônus.
-          </CardDescription>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-background">
+      <div
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-10"
+        style={{ backgroundImage: `url(${logoImg})` }}
+      />
+      <div className="absolute inset-0 z-0 bg-background/60 backdrop-blur-sm" />
+
+      <Card className="w-full max-w-sm animate-fade-in relative z-10 border-primary/20 shadow-2xl shadow-primary/5">
+        <CardHeader className="space-y-4 pb-6 flex flex-col items-center text-center">
+          <img
+            src={logoImg}
+            alt="Mentoria DTS Bônus"
+            className="w-32 h-auto object-contain animate-slide-up"
+          />
+          <div className="space-y-2 w-full">
+            <CardTitle className="text-2xl font-bold text-primary">Login</CardTitle>
+            <CardDescription className="text-base font-normal text-foreground">
+              Entre na sua conta para acessar os bônus.
+            </CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
