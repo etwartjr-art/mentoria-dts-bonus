@@ -14,60 +14,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ArrowLeft, Save, Download, AlertTriangle, Info, Loader2 } from 'lucide-react'
+import { ArrowLeft, Save, Download, AlertTriangle, Info, Loader2, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/hooks/use-auth'
+import { useRealtime } from '@/hooks/use-realtime'
 import {
   getHistoryCalculadora,
   createDadosCalculadora,
+  deleteDadosCalculadora,
   DadosCalculadora,
 } from '@/services/dados_calculadora'
 import { trackAccess } from '@/services/progress'
-
-const iframeContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; background: #fff; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; color: #333; }
-    th, td { border: 1px solid #e2e3e3; padding: 8px 12px; text-align: left; }
-    th { background: #f8f9fa; color: #5f6368; font-weight: 600; text-align: center; }
-    .row-header { background: #f8f9fa; color: #5f6368; text-align: center; width: 30px; font-weight: normal; }
-    .header-row th { border-bottom: 2px solid #dadce0; }
-    tr:hover td { background-color: #f1f3f4; }
-  </style>
-</head>
-<body>
-  <table>
-    <tr class="header-row">
-      <th class="row-header"></th>
-      <th>A<br>Serviço</th>
-      <th>B<br>Preço</th>
-      <th>C<br>Insumos</th>
-      <th>D<br>Impostos</th>
-      <th>E<br>Comissão</th>
-      <th>F<br>Duração (min)</th>
-      <th>G<br>Custo Op./Min</th>
-      <th>H<br>Lucro Líquido</th>
-      <th>I<br>Margem (%)</th>
-    </tr>
-    <tr>
-      <td class="row-header">1</td>
-      <td>Escova</td><td>R$ 150,00</td><td>R$ 20,00</td><td>R$ 22,50</td><td>R$ 75,00</td><td>60 min.</td><td>R$ 0,50</td><td>R$ 2,50</td><td>1,67%</td>
-    </tr>
-    <tr>
-      <td class="row-header">2</td>
-      <td>Hidratação</td><td>R$ 120,00</td><td>R$ 15,00</td><td>R$ 18,00</td><td>R$ 60,00</td><td>45 min.</td><td>R$ 0,50</td><td>R$ 4,50</td><td>3,75%</td>
-    </tr>
-    <tr>
-      <td class="row-header">3</td>
-      <td>Corte</td><td>R$ 80,00</td><td>R$ 5,00</td><td>R$ 12,00</td><td>R$ 40,00</td><td>30 min.</td><td>R$ 0,50</td><td>R$ 8,00</td><td>10,00%</td>
-    </tr>
-  </table>
-</body>
-</html>
-`
 
 export default function Calculator() {
   const { user } = useAuth()
@@ -152,6 +109,21 @@ export default function Calculator() {
     return () => observer.disconnect()
   }, [hasMore, isLoadingHistory])
 
+  useRealtime('dados_calculadora', (e) => {
+    if (e.action === 'create') {
+      setHistory((prev) => {
+        if (prev.some((item) => item.id === e.record.id)) return prev
+        return [e.record as unknown as DadosCalculadora, ...prev]
+      })
+    } else if (e.action === 'update') {
+      setHistory((prev) =>
+        prev.map((m) => (m.id === e.record.id ? (e.record as unknown as DadosCalculadora) : m)),
+      )
+    } else if (e.action === 'delete') {
+      setHistory((prev) => prev.filter((m) => m.id !== e.record.id))
+    }
+  })
+
   const pVenda = Number(form.preco_venda) || 0
   const cInsumos = Number(form.custo_insumos) || 0
   const impostos = Number(form.impostos) || 0
@@ -204,12 +176,20 @@ export default function Calculator() {
         user: user!.id,
       })
       toast.success('Cálculo salvo com sucesso!')
-      setPage(1)
-      loadHistory(1, false)
+      // Histórico atualizado automaticamente via useRealtime
     } catch (e) {
       toast.error('Erro ao salvar cálculo')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDadosCalculadora(id)
+      toast.success('Cálculo removido com sucesso')
+    } catch (e) {
+      toast.error('Erro ao remover cálculo')
     }
   }
 
@@ -245,7 +225,8 @@ export default function Calculator() {
     })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = 'calculadora_historico.csv'
+    const dateStr = new Date().toISOString().split('T')[0]
+    link.download = `relatorio-lucro-real-${dateStr}.csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -489,49 +470,40 @@ export default function Calculator() {
           </Card>
         </div>
 
-        <div className="space-y-6">
-          <Card className="overflow-hidden h-[400px]">
-            <CardHeader className="pb-4">
+        <div className="space-y-6 h-full min-h-[500px]">
+          <Card className="h-full flex flex-col">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4 border-b">
               <CardTitle className="text-[18px] font-semibold text-foreground">
-                Comparativo na Planilha
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0 h-[calc(100%-70px)]">
-              <iframe
-                loading="lazy"
-                srcDoc={iframeContent}
-                className="w-full h-full border-0"
-                title="Google Sheets Mock"
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-4">
-              <CardTitle className="text-[18px] font-semibold text-foreground">
-                Últimos Cálculos
+                Relatório de Cálculos Salvos
               </CardTitle>
               <Button
                 variant="outline"
                 onClick={exportToCSV}
                 disabled={history.length === 0}
-                aria-label="Exportar para Excel"
-                className="w-full sm:w-auto transition-all duration-200 hover:scale-105"
+                aria-label="Baixar Relatório"
+                className="w-full sm:w-auto transition-all duration-200 hover:scale-105 border-primary text-primary hover:bg-primary/10"
               >
                 <Download className="size-5 mr-2" />{' '}
-                <span className="hidden sm:inline">Exportar para Excel</span>
-                <span className="sm:hidden">Exportar</span>
+                <span className="hidden sm:inline">Baixar Relatório</span>
+                <span className="sm:hidden">Baixar</span>
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 p-0 flex flex-col">
               {isLoadingHistory && page === 1 ? (
-                <Skeleton className="h-32 w-full" />
+                <div className="p-6">
+                  <Skeleton className="h-32 w-full" />
+                </div>
               ) : history.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Nenhum cálculo salvo ainda.
-                </p>
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center text-muted-foreground min-h-[300px]">
+                  <Info className="size-10 mb-4 text-muted-foreground/50" />
+                  <p className="text-lg font-medium text-foreground mb-1">Nenhum cálculo salvo</p>
+                  <p className="text-sm">
+                    Preencha os dados ao lado e clique em salvar para começar seu histórico de
+                    precificação.
+                  </p>
+                </div>
               ) : (
-                <div className="max-h-[400px] overflow-y-auto pr-2 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 max-h-[800px]">
                   <div className="hidden sm:block border rounded-md">
                     <Table>
                       <TableHeader className="bg-secondary/50 sticky top-0 z-10 shadow-sm">
@@ -540,17 +512,32 @@ export default function Calculator() {
                           <TableHead>Preço</TableHead>
                           <TableHead>Lucro</TableHead>
                           <TableHead>Margem</TableHead>
+                          <TableHead className="w-[50px]"></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {history.map((item) => (
                           <TableRow key={item.id}>
-                            <TableCell className="font-medium truncate max-w-[100px]">
+                            <TableCell
+                              className="font-medium truncate max-w-[150px]"
+                              title={item.servico}
+                            >
                               {item.servico}
                             </TableCell>
                             <TableCell>{formatCurrency(item.preco_venda)}</TableCell>
                             <TableCell>{formatCurrency(item.lucro_liquido)}</TableCell>
                             <TableCell>{item.margem_lucro?.toFixed(2)}%</TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDelete(item.id)}
+                                className="text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                                aria-label="Excluir"
+                              >
+                                <Trash2 className="size-4" />
+                              </Button>
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -562,13 +549,19 @@ export default function Calculator() {
                         key={item.id}
                         className="bg-card border rounded-lg p-4 space-y-2 shadow-sm"
                       >
-                        <div className="flex justify-between items-center pb-2 border-b">
-                          <span className="font-bold text-[16px] truncate max-w-[150px] text-primary">
+                        <div className="flex justify-between items-start pb-2 border-b gap-2">
+                          <span className="font-bold text-[16px] text-primary break-words">
                             {item.servico}
                           </span>
-                          <span className="text-[14px] font-medium bg-secondary/10 text-secondary px-2 py-1 rounded">
-                            {item.margem_lucro?.toFixed(2)}%
-                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(item.id)}
+                            className="text-destructive hover:text-destructive/90 hover:bg-destructive/10 h-8 w-8 shrink-0 -mt-1 -mr-1"
+                            aria-label="Excluir"
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
                         </div>
                         <div className="flex justify-between items-center pt-1">
                           <span className="text-[14px] text-muted-foreground">Preço:</span>
@@ -580,6 +573,12 @@ export default function Calculator() {
                           <span className="text-[14px] text-muted-foreground">Lucro:</span>
                           <span className="text-[14px] font-medium text-success">
                             {formatCurrency(item.lucro_liquido)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[14px] text-muted-foreground">Margem:</span>
+                          <span className="text-[14px] font-medium bg-secondary/10 text-secondary px-2 py-1 rounded">
+                            {item.margem_lucro?.toFixed(2)}%
                           </span>
                         </div>
                       </div>
