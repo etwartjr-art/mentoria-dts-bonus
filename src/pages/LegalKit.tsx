@@ -20,6 +20,9 @@ import { useToast } from '@/hooks/use-toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Share2, FileDown, CheckCircle2, AlertTriangle, Scale } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { CompanyProfileModal } from '@/components/CompanyProfileModal'
+import { getDadosEmpresa, type DadosEmpresa } from '@/services/dados_empresa'
+import pb from '@/lib/pocketbase/client'
 
 const checklistItems = [
   'Identificação das partes',
@@ -33,10 +36,10 @@ const checklistItems = [
   'Assinatura',
 ]
 
-const ndaText = `ACORDO DE CONFIDENCIALIDADE (NDA)
+const generateNdaText = (empresa: DadosEmpresa | null) => `ACORDO DE CONFIDENCIALIDADE (NDA)
 
 PARTES:
-[Nome do Salão Parceiro], CNPJ [00.000.000/0000-00], neste ato representado por [Nome do Representante], doravante denominado SALÃO.
+${empresa?.razao_social || '[Nome do Salão Parceiro]'}, CNPJ ${empresa?.cnpj || '[00.000.000/0000-00]'}, sediada em ${empresa?.endereco_completo || '[Endereço Completo]'} - ${empresa?.cidade_estado || '[Cidade/Estado]'}, neste ato representado por [Nome do Representante], doravante denominado SALÃO.
 [Nome do Profissional Parceiro], CPF [000.000.000-00], doravante denominado PROFISSIONAL.
 
 CONSIDERANDO QUE:
@@ -59,7 +62,7 @@ CLÁUSULA 5 - DA PENALIDADE
 A quebra de confidencialidade sujeitará o infrator ao pagamento de multa de [Valor] reais, além de perdas e danos apurados judicialmente.
 
 CLÁUSULA 6 - DO FORO
-Fica eleito o foro da comarca de [Cidade/Estado] para dirimir quaisquer dúvidas decorrentes deste acordo.`
+Fica eleito o foro da comarca de ${empresa?.cidade_estado || '[Cidade/Estado]'} para dirimir quaisquer dúvidas decorrentes deste acordo.`
 
 const errors = [
   {
@@ -91,6 +94,9 @@ export default function LegalKit() {
   const [checklistCompleto, setChecklistCompleto] = useState(false)
   const [ndaBaixado, setNdaBaixado] = useState(false)
 
+  const [dadosEmpresa, setDadosEmpresa] = useState<DadosEmpresa | null>(null)
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false)
+
   useEffect(() => {
     trackAccess('juridico')
     loadData()
@@ -99,6 +105,9 @@ export default function LegalKit() {
   const loadData = async () => {
     try {
       setLoading(true)
+      const emp = await getDadosEmpresa()
+      setDadosEmpresa(emp)
+
       let p = await getProgress()
       if (!p) {
         p = await updateProgress({
@@ -147,6 +156,15 @@ export default function LegalKit() {
   }
 
   const handleDownloadNda = async () => {
+    if (!dadosEmpresa) {
+      toast({
+        title: 'Perfil incompleto',
+        description: 'Preencha os dados da empresa para gerar o documento personalizado.',
+      })
+      setIsCompanyModalOpen(true)
+      return
+    }
+
     window.print()
     setNdaBaixado(true)
     await updateProgress({ nda_baixado: true })
@@ -204,16 +222,38 @@ export default function LegalKit() {
   return (
     <>
       <div className="hidden print:block p-8 font-sans text-black whitespace-pre-wrap">
-        {ndaText}
+        {dadosEmpresa?.logotipo && (
+          <img
+            src={pb.files.getURL(dadosEmpresa, dadosEmpresa.logotipo as string)}
+            alt="Logo da Empresa"
+            className="h-20 object-contain mb-8"
+          />
+        )}
+        {generateNdaText(dadosEmpresa)}
       </div>
       <div className="max-w-6xl mx-auto space-y-8 animate-fade-in print:hidden">
-        <div className="space-y-2">
-          <h1 className="text-[24px] font-bold text-primary tracking-tight leading-tight">
-            Kit de Sobrevivência Jurídica
-          </h1>
-          <p className="text-[16px] font-normal text-foreground">
-            Proteja seu negócio de passivos trabalhistas com os fundamentos corretos.
-          </p>
+        <CompanyProfileModal
+          open={isCompanyModalOpen}
+          onOpenChange={setIsCompanyModalOpen}
+          initialData={dadosEmpresa}
+          onSave={setDadosEmpresa}
+        />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-[24px] font-bold text-primary tracking-tight leading-tight">
+              Kit de Sobrevivência Jurídica
+            </h1>
+            <p className="text-[16px] font-normal text-foreground">
+              Proteja seu negócio de passivos trabalhistas com os fundamentos corretos.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setIsCompanyModalOpen(true)}
+            className="shrink-0 transition-all duration-200 hover:scale-105 min-h-[44px]"
+          >
+            {dadosEmpresa ? 'Editar Dados da Empresa' : 'Completar Perfil da Empresa'}
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -333,7 +373,7 @@ export default function LegalKit() {
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="mt-4 p-4 bg-background border rounded-md text-sm font-mono whitespace-pre-wrap text-foreground max-h-[400px] overflow-y-auto">
-                        {ndaText}
+                        {generateNdaText(dadosEmpresa)}
                       </div>
                     </AccordionContent>
                   </AccordionItem>
